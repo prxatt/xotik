@@ -4,13 +4,23 @@ import Link from "next/link";
 import { copy, t } from "@/lib/copy";
 import { useLanguage } from "@/context/LanguageContext";
 import { useHeaderSolid } from "@/hooks/useHeaderSolid";
+import type { RefObject } from "react";
+
+export const MOBILE_MENU_ID = "mobile-menu";
 
 type SiteHeaderProps = {
   activeChapter?: number;
+  menuOpen?: boolean;
+  menuButtonRef?: RefObject<HTMLButtonElement | null>;
   onMenuOpen?: () => void;
 };
 
-export function SiteHeader({ activeChapter = 1, onMenuOpen }: SiteHeaderProps) {
+export function SiteHeader({
+  activeChapter = 1,
+  menuOpen = false,
+  menuButtonRef,
+  onMenuOpen,
+}: SiteHeaderProps) {
   const { locale, toggleLocale } = useLanguage();
   const solid = useHeaderSolid();
 
@@ -59,11 +69,13 @@ export function SiteHeader({ activeChapter = 1, onMenuOpen }: SiteHeaderProps) {
           </Link>
 
           <button
+            ref={menuButtonRef}
             type="button"
             onClick={onMenuOpen}
             className="font-label rounded-full border border-line bg-white/60 px-3 py-2 text-[10px] text-ink hover:bg-white md:hidden"
             aria-label={t(copy.header.menu, locale)}
-            aria-expanded={false}
+            aria-expanded={menuOpen}
+            aria-controls={MOBILE_MENU_ID}
           >
             {t(copy.header.menu, locale)}
           </button>

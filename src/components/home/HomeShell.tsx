@@ -5,17 +5,27 @@ import { copy, t, tLines } from "@/lib/copy";
 import { useLanguage } from "@/context/LanguageContext";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { MobileMenu } from "@/components/layout/MobileMenu";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 export function HomeShell() {
   const { locale } = useLanguage();
   const [menuOpen, setMenuOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
   const headlines = tLines(copy.hero.headline, locale);
 
   return (
     <>
-      <SiteHeader activeChapter={1} onMenuOpen={() => setMenuOpen(true)} />
-      <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <SiteHeader
+        activeChapter={1}
+        menuOpen={menuOpen}
+        menuButtonRef={menuButtonRef}
+        onMenuOpen={() => setMenuOpen(true)}
+      />
+      <MobileMenu
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        returnFocusRef={menuButtonRef}
+      />
 
       <main id="main">
         <section
@@ -24,11 +34,7 @@ export function HomeShell() {
         >
           <div className="mx-auto w-full max-w-[1280px]">
             <p className="font-label mb-4 text-j-coral">01 — Street</p>
-            <h1
-              className={`font-display max-w-[14ch] text-[clamp(2.5rem,8vw,4.5rem)] font-bold leading-[0.95] text-ink ${
-                locale === "hinglish" ? "font-hindi" : ""
-              }`}
-            >
+            <h1 className="font-display max-w-[14ch] text-[clamp(2.5rem,8vw,4.5rem)] font-bold leading-[0.95] text-ink">
               {headlines.map((line) => (
                 <span key={line} className="block">
                   {line}
