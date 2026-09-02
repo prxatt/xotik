@@ -1,5 +1,5 @@
 import { SectionFallback } from "@/components/fallback/SectionFallback";
-import { copy, tLines, type Locale } from "@/lib/copy";
+import { copy, t, tLines, type Locale } from "@/lib/copy";
 
 function FactoryCopy({ locale }: { locale: Locale }) {
   const lines = tLines(copy.factory.headline, locale);
@@ -15,7 +15,7 @@ function FactoryCopy({ locale }: { locale: Locale }) {
         ))}
       </h2>
       <p className="font-body mt-6 max-w-lg text-sm text-ink/70 md:text-base">
-        {copy.factory.micro.en}
+        {t(copy.factory.micro, locale)}
       </p>
     </div>
   );

@@ -10,7 +10,7 @@ function CtaContent({ locale }: { locale: Locale }) {
         {t(copy.cta.primary, locale)}
       </h2>
       <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-        <Link href="#find-j" className="btn-primary">
+        <Link href="#stores" className="btn-primary">
           {t(copy.cta.primary, locale)} →
         </Link>
         <Link
@@ -19,6 +19,23 @@ function CtaContent({ locale }: { locale: Locale }) {
         >
           {t(copy.cta.secondary, locale)}
         </Link>
+      </div>
+      <div
+        id="stores"
+        className="font-body mx-auto mt-12 max-w-md rounded-2xl border border-line bg-white px-6 py-5 text-sm text-ink/75"
+      >
+        <p className="font-label mb-2 text-[10px] text-j-green">Store locator</p>
+        <p>
+          {locale === "en"
+            ? "Full store map launches in Phase 2. For now, reach us to find J near you."
+            : "Full store map Phase 2 mein aayega. Abhi J dhundhne ke liye contact karo."}
+        </p>
+        <a
+          href={`mailto:${copy.footer.email}`}
+          className="mt-3 inline-block font-medium text-ink underline-offset-2 hover:underline"
+        >
+          {copy.footer.email}
+        </a>
       </div>
       <p className="font-label mt-12 text-[10px] text-ink/50">
         FORBES INDIA · ET BRAND EQUITY · YOURSTORY · MONEYCONTROL

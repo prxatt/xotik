@@ -18,7 +18,7 @@ const links = [
   { href: "/", label: { en: "Home", hinglish: "Home" } },
   { href: "/privacy", label: { en: "Privacy", hinglish: "Privacy" } },
   { href: "/terms", label: { en: "Terms", hinglish: "Terms" } },
-  { href: "#meet-j", label: copy.header.cta },
+  { href: "#product", label: copy.header.cta },
 ];
 
 const FOCUSABLE =

@@ -34,13 +34,13 @@ function StreetCopy({ locale }: { locale: Locale }) {
   return (
     <div className="relative z-10 mx-auto w-full max-w-[1280px] px-[var(--section-pad-x)] pb-16 pt-24 md:px-[var(--section-pad-x-desktop)] md:pb-24">
       <p className="font-label mb-4 text-j-coral">01 — Street</p>
-      <h1 className="font-display max-w-[16ch] text-[clamp(2rem,6vw,3.5rem)] font-bold leading-[0.95] text-ink">
+      <h2 className="font-display max-w-[16ch] text-[clamp(2rem,6vw,3.5rem)] font-bold leading-[0.95] text-ink">
         {lines.map((line) => (
           <span key={line} className="block">
             {line}
           </span>
         ))}
-      </h1>
+      </h2>
       <p className="font-label mt-8 text-[10px] text-ink/50">Scroll ↓</p>
     </div>
   );
@@ -121,18 +121,18 @@ export function HeroIntro({ locale }: { locale: Locale }) {
       className="relative flex min-h-[min(100dvh,720px)] flex-col justify-end border-b border-line/40 bg-paper px-[var(--section-pad-x)] pb-12 pt-24 md:px-[var(--section-pad-x-desktop)]"
     >
       <div className="mx-auto w-full max-w-[1280px]">
-        <h2 className="font-display max-w-[14ch] text-[clamp(2.5rem,8vw,4.5rem)] font-bold leading-[0.95] text-ink">
+        <h1 className="font-display max-w-[14ch] text-[clamp(2.5rem,8vw,4.5rem)] font-bold leading-[0.95] text-ink">
           {headlines.map((line) => (
             <span key={line} className="block">
               {line}
             </span>
           ))}
-        </h2>
+        </h1>
         <p className="font-body mt-6 max-w-md text-base text-ink/75 md:text-lg">
           {t(copy.hero.sub, locale)}
         </p>
         <div className="mt-8">
-          <Link id="meet-j" href="#product" className="btn-primary">
+          <Link href="#product" className="btn-primary">
             {t(copy.hero.cta, locale)}
           </Link>
         </div>
