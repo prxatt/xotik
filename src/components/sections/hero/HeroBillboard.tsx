@@ -1,30 +1,81 @@
 import type { ReactNode } from "react";
-import { WordSplit } from "@/lib/motion/splitWords";
+
+const RIBBON_REPEAT = 8;
 
 type HeroBillboardProps = {
   children: ReactNode;
-  /** Sticky pin frame for kinetic scroll (Tier 1/2) */
-  pin?: boolean;
+  frameRef?: React.RefObject<HTMLDivElement | null>;
+  ribbonText?: string;
+  garnishTop?: string;
+  garnishBox?: string;
+  stampText?: string;
+  garnishTopRef?: React.RefObject<HTMLParagraphElement | null>;
+  garnishBoxRef?: React.RefObject<HTMLParagraphElement | null>;
+  stampRef?: React.RefObject<HTMLDivElement | null>;
+  /** Allow type to scale/translate outside frame without clipping */
+  clip?: boolean;
 };
 
 /**
- * Shared desi-pop billboard shell — matches /tokens jaguar header.
- * Background layers are absolute so sticky pinning is never overridden.
+ * Desi-pop billboard shell — Maaza cobalt + Souk condensed type + PA'LANTE ribbons.
+ * Pinning is handled by GSAP in HeroKineticScene.
  */
-export function HeroBillboard({ children, pin = false }: HeroBillboardProps) {
-  const frameClass = pin
-    ? "hero-pin sticky top-0 h-[100dvh] min-h-[100dvh] w-full overflow-hidden"
-    : "relative min-h-[100dvh] w-full overflow-hidden";
+export function HeroBillboard({
+  children,
+  frameRef,
+  ribbonText = "J BY JEERU · XOTIK FRUJUS · ",
+  garnishTop,
+  garnishBox,
+  stampText,
+  garnishTopRef,
+  garnishBoxRef,
+  stampRef,
+  clip = true,
+}: HeroBillboardProps) {
+  const ribbonChunk = ribbonText.repeat(RIBBON_REPEAT);
 
   return (
-    <div className={frameClass}>
+    <div
+      ref={frameRef}
+      className={`hero-pin-frame relative h-[100dvh] min-h-[100dvh] w-full ${
+        clip ? "overflow-hidden" : "overflow-visible"
+      }`}
+    >
       <div className="hero-billboard__bg" aria-hidden />
-      <div className="hero-billboard__grain" aria-hidden />
       <div className="hero-billboard__glow" aria-hidden />
-      <div className="relative z-10 flex h-full flex-col justify-center px-[var(--section-pad-x)] pb-10 pt-20 md:px-[var(--section-pad-x-desktop)] md:pb-14 md:pt-24">
-        <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-6 md:gap-8">
-          {children}
+      <div className="hero-billboard__halftone" aria-hidden />
+      <div className="hero-billboard__grain" aria-hidden />
+
+      <div className="hero-billboard__frame-line hero-billboard__frame-line--left" aria-hidden />
+      <div className="hero-billboard__frame-line hero-billboard__frame-line--right" aria-hidden />
+
+      <div className="hero-billboard__ribbon hero-billboard__ribbon--a" aria-hidden>
+        <span>{ribbonChunk}</span>
+      </div>
+      <div className="hero-billboard__ribbon hero-billboard__ribbon--b" aria-hidden>
+        <span>{ribbonChunk}</span>
+      </div>
+
+      {garnishTop && (
+        <p ref={garnishTopRef} className="hero-garnish hero-garnish--tl">
+          {garnishTop}
+        </p>
+      )}
+
+      {garnishBox && (
+        <p ref={garnishBoxRef} className="hero-garnish hero-garnish--br hero-garnish-box">
+          {garnishBox}
+        </p>
+      )}
+
+      {stampText && (
+        <div ref={stampRef} className="hero-stamp" aria-hidden>
+          {stampText}
         </div>
+      )}
+
+      <div className="relative z-10 flex h-full flex-col justify-center px-[var(--section-pad-x)] pb-10 pt-20 md:px-[var(--section-pad-x-desktop)] md:pb-14 md:pt-24">
+        <div className="mx-auto w-full max-w-[1280px]">{children}</div>
       </div>
     </div>
   );
@@ -32,39 +83,47 @@ export function HeroBillboard({ children, pin = false }: HeroBillboardProps) {
 
 type HeroBillboardCopyProps = {
   locale: "en" | "hinglish";
+  receipt: string;
   devanagariAccent: string;
   headlines: readonly string[];
   sub: string;
   cta: ReactNode;
-  kinetic?: boolean;
+  typeLayerRef?: React.RefObject<HTMLDivElement | null>;
+  ghostRef?: React.RefObject<HTMLDivElement | null>;
   accentRef?: React.RefObject<HTMLParagraphElement | null>;
   headlineRef?: React.RefObject<HTMLHeadingElement | null>;
   subRef?: React.RefObject<HTMLParagraphElement | null>;
   ctaRef?: React.RefObject<HTMLDivElement | null>;
+  kineticLines?: boolean;
 };
 
 export function HeroBillboardCopy({
   locale,
+  receipt,
   devanagariAccent,
   headlines,
   sub,
   cta,
-  kinetic = false,
+  typeLayerRef,
+  ghostRef,
   accentRef,
   headlineRef,
   subRef,
   ctaRef,
+  kineticLines = false,
 }: HeroBillboardCopyProps) {
   const showDevanagariAccent = locale === "en";
 
-  return (
-    <>
-      <p className="font-receipt text-cine-olive">01 · J · Xotik Frujus</p>
+  const typeContent = (
+    <div className="flex flex-col gap-4 md:gap-6">
+      <p className="font-receipt text-[11px] tracking-[0.12em] text-hero-ink/85 md:text-xs">
+        {receipt}
+      </p>
 
       {showDevanagariAccent && (
         <p
           ref={accentRef}
-          className="font-devanagari-display text-[clamp(2.75rem,12vw,5.5rem)] leading-[1.1] text-cine-gold"
+          className="hero-kinetic-accent font-devanagari-display text-[clamp(2.75rem,12vw,5.5rem)] leading-[1.08] text-hero-ink"
         >
           {devanagariAccent}
         </p>
@@ -72,23 +131,58 @@ export function HeroBillboardCopy({
 
       <h1
         ref={headlineRef}
-        className="font-condensed max-w-[11ch] text-[clamp(4rem,18vw,9.5rem)] leading-[0.82] tracking-[0.01em] text-paper"
+        className="hero-kinetic-headline font-condensed text-[clamp(4rem,22vw,12.5rem)] leading-[0.82] tracking-[0.03em] text-hero-ink"
       >
         {headlines.map((line, index) => (
           <span
             key={line}
-            className={`block ${index === headlines.length - 1 ? "text-cine-gold" : ""}`}
+            className={`hero-kinetic-line block ${
+              index === headlines.length - 1 ? "text-hero-accent" : ""
+            }`}
+            data-line={index}
           >
-            {kinetic ? <WordSplit text={line} /> : line}
+            {line}
           </span>
         ))}
       </h1>
+    </div>
+  );
 
-      <p ref={subRef} className="font-body max-w-md text-base text-cine-olive/95 md:text-lg">
+  return (
+    <>
+      {kineticLines && (
+        <div
+          ref={ghostRef}
+          aria-hidden
+          className="hero-kinetic-ghost pointer-events-none absolute left-[var(--section-pad-x)] top-1/2 z-0 -translate-y-1/2 will-change-transform md:left-[var(--section-pad-x-desktop)]"
+        >
+          <h2 className="hero-kinetic-headline font-condensed text-[clamp(4rem,22vw,12.5rem)] leading-[0.82] tracking-[0.03em] opacity-30">
+            {headlines.map((line) => (
+              <span key={`ghost-${line}`} className="hero-kinetic-line block">
+                {line}
+              </span>
+            ))}
+          </h2>
+        </div>
+      )}
+
+      <div
+        ref={typeLayerRef}
+        className={kineticLines ? "hero-kinetic-type relative z-10 will-change-transform" : ""}
+      >
+        {typeContent}
+      </div>
+
+      <p
+        ref={subRef}
+        className="font-body mt-8 max-w-md text-base text-hero-ink/90 md:mt-10 md:text-lg"
+      >
         {sub}
       </p>
 
-      <div ref={ctaRef}>{cta}</div>
+      <div ref={ctaRef} className="mt-8">
+        {cta}
+      </div>
     </>
   );
 }

@@ -3,6 +3,15 @@
  * Phase 1.5a — applied site-wide in Phase 1.7 retrofit.
  */
 export const sceneTokens = {
+  hero: {
+    id: "hero",
+    chapter: "00",
+    bg: "var(--hero-bg)",
+    surface: "var(--hero-surface)",
+    ink: "var(--hero-ink)",
+    accent: "var(--hero-accent)",
+    label: "Open",
+  },
   street: {
     id: "street",
     chapter: "01",

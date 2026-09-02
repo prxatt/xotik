@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 export type HeaderTheme = "dark-hero" | "solid" | "transparent";
 
 /**
- * dark-hero: inverted marks on jaguar hero (top of page)
+ * dark-hero: inverted marks on desi-pop cobalt hero (top of page)
  * transparent: dark marks, transparent bar (post-hero, pre-solid)
  * solid: cream bar after scroll threshold
  */

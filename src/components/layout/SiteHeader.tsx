@@ -31,11 +31,11 @@ export function SiteHeader({
     ? `${String(activeChapter).padStart(2, "0")} — ${chapter.label[locale]}`
     : "01 — Street";
 
-  const inkClass = onDarkHero ? "text-paper" : "text-ink";
-  const mutedClass = onDarkHero ? "text-paper/70" : "text-ink/70";
-  const chapterClass = onDarkHero ? "text-cine-olive" : "text-ink/80";
+  const inkClass = onDarkHero ? "text-hero-ink" : "text-ink";
+  const mutedClass = onDarkHero ? "text-hero-ink/75" : "text-ink/70";
+  const chapterClass = onDarkHero ? "text-hero-ink/90" : "text-ink/80";
   const chipClass = onDarkHero
-    ? "border-paper/25 bg-white/10 text-paper hover:bg-white/20"
+    ? "border-hero-ink/35 bg-hero-ink/10 text-hero-ink hover:bg-hero-ink/20"
     : "border-line bg-white/60 text-ink hover:bg-white";
 
   return (

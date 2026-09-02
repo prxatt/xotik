@@ -27,6 +27,19 @@ export const copy = {
       en: ["POCKET-SIZED", "PRIDE."],
       hinglish: ["जेब में J.", "FULL scene."],
     },
+    receipt: { en: "01 · J · Xotik Frujus", hinglish: "01 · J · Xotik Frujus" },
+    ribbon: "J BY JEERU · XOTIK FRUJUS · DESI POP · ",
+    garnish: {
+      top: {
+        en: "Gully cricket ke baad, cycle ride ke baad.",
+        hinglish: "Gully cricket ke baad, cycle ride ke baad.",
+      },
+      box: {
+        en: "Before fancy drinks… there was J.",
+        hinglish: "Fancy drinks se pehle… bas J tha.",
+      },
+    },
+    stamp: { en: "पूरा FIZZ", hinglish: "पूरा FIZZ" },
     cta: { en: "Meet J", hinglish: "Mil J" },
     sub: {
       en: "Apple juice. Masala fizz. Very desi. Very J.",
