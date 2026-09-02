@@ -9,6 +9,8 @@ import { StreetFactoryBlock } from "@/components/sections/StreetFactoryBlock";
 import { ProductSection } from "@/components/sections/ProductSection";
 import { IngredientsSection } from "@/components/sections/IngredientsSection";
 import { ManifestoSection } from "@/components/sections/ManifestoSection";
+import { DesiPopCursor } from "@/components/motion/DesiPopCursor";
+import { useScrollChapter } from "@/hooks/useScrollChapter";
 import { CtaSection } from "@/components/sections/CtaSection";
 import { useRef, useState } from "react";
 
@@ -17,10 +19,13 @@ export function HomeShell() {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
 
+  const activeChapter = useScrollChapter();
+
   return (
     <>
+      <DesiPopCursor />
       <SiteHeader
-        activeChapter={1}
+        activeChapter={activeChapter}
         menuOpen={menuOpen}
         menuButtonRef={menuButtonRef}
         onMenuOpen={() => setMenuOpen(true)}

@@ -14,11 +14,16 @@ type MobileMenuProps = {
   returnFocusRef?: RefObject<HTMLButtonElement | null>;
 };
 
+const chapterLinks = copy.chapters.map((chapter, index) => ({
+  href: `#${chapter.id}`,
+  label: chapter.label,
+  index: index + 1,
+}));
+
 const links = [
-  { href: "/", label: { en: "Home", hinglish: "Home" } },
-  { href: "/privacy", label: { en: "Privacy", hinglish: "Privacy" } },
-  { href: "/terms", label: { en: "Terms", hinglish: "Terms" } },
-  { href: "#product", label: copy.header.cta },
+  ...chapterLinks,
+  { href: "/privacy", label: { en: "Privacy", hinglish: "Privacy" }, index: 0 },
+  { href: "/terms", label: { en: "Terms", hinglish: "Terms" }, index: 0 },
 ];
 
 const FOCUSABLE =
@@ -138,7 +143,9 @@ export function MobileMenu({ open, onClose, returnFocusRef }: MobileMenuProps) {
             href={link.href}
             onClick={onClose}
             className="font-body rounded-xl px-3 py-3 text-lg font-medium text-ink no-underline hover:bg-white"
+            data-cursor-label={link.index > 0 ? String(link.index).padStart(2, "0") : undefined}
           >
+            {link.index > 0 ? `${String(link.index).padStart(2, "0")} — ` : ""}
             {t(link.label, locale)}
           </Link>
         ))}

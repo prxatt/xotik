@@ -1,48 +1,63 @@
+"use client";
+
+import { useRef, type CSSProperties } from "react";
 import { SectionFallback } from "@/components/fallback/SectionFallback";
-import { copy, tLines, type Locale } from "@/lib/copy";
+import { useCapabilityTierContext } from "@/context/CapabilityTierContext";
+import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
+import { useSectionReveal } from "@/hooks/useSectionReveal";
+import { copy, t, tLines, type Locale } from "@/lib/copy";
 
-const INGREDIENTS = [
-  { name: "Jeera", color: "var(--j-yellow)" },
-  { name: "Apple", color: "var(--j-green)" },
-  { name: "Spice", color: "var(--j-coral)" },
-  { name: "Fizz", color: "var(--j-blue)" },
-] as const;
-
-function IngredientsCopy({ locale }: { locale: Locale }) {
+function IngredientsPanel({ locale, animated }: { locale: Locale; animated: boolean }) {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const { tier } = useCapabilityTierContext();
+  const prefersReducedMotion = usePrefersReducedMotion();
   const lines = tLines(copy.ingredients.headline, locale);
 
+  useSectionReveal(rootRef, {
+    enabled: animated && !prefersReducedMotion && tier > 0,
+    progress: false,
+  });
+
   return (
-    <div className="relative z-10 mx-auto w-full max-w-[1280px] px-[var(--section-pad-x)] py-20 md:px-[var(--section-pad-x-desktop)]">
-      <p className="font-label mb-4 text-j-violet">04 — Taste</p>
-      <h2 className="font-display text-[clamp(2rem,6vw,3.5rem)] font-bold leading-[0.95] text-ink">
+    <div
+      ref={rootRef}
+      className="mx-auto w-full max-w-[1280px] px-[var(--section-pad-x)] py-20 md:px-[var(--section-pad-x-desktop)] md:py-28"
+    >
+      <p className="font-receipt mb-4 text-[11px] tracking-[0.2em] text-scene-accent">
+        04 · {t(copy.ingredients.eyebrow, locale)}
+      </p>
+      <h2 className="font-condensed mb-3 text-[clamp(2.5rem,10vw,5rem)] leading-[0.88] text-scene-surface">
         {lines.map((line) => (
-          <span key={line} className="block">
+          <span key={line} className="section-kinetic-line block">
             {line}
           </span>
         ))}
       </h2>
-    </div>
-  );
-}
+      <p className="font-receipt mb-10 max-w-lg text-sm tracking-[0.06em] text-scene-surface/85 md:text-base">
+        {t(copy.ingredients.lead, locale)}
+      </p>
 
-function IngredientCollage({ animated }: { animated: boolean }) {
-  return (
-    <div className="mx-auto grid max-w-md grid-cols-2 gap-4 px-6 pb-16">
-      {INGREDIENTS.map((item, index) => (
-        <div
-          key={item.name}
-          className={`flex aspect-square items-center justify-center rounded-3xl border border-line font-label text-[11px] text-ink ${
-            animated ? "motion-safe:animate-pulse" : ""
-          }`}
-          style={{
-            backgroundColor: item.color,
-            animationDelay: animated ? `${index * 200}ms` : undefined,
-            opacity: 0.85,
-          }}
-        >
-          {item.name}
-        </div>
-      ))}
+      <div className="taste-grid">
+        {copy.ingredients.items.map((item) => (
+          <article
+            key={item.id}
+            className={`taste-card ${item.id === "jeera" ? "taste-card--hero" : ""}`}
+            style={
+              {
+                "--taste-bg": item.bg,
+                "--taste-ink": item.ink,
+              } as CSSProperties
+            }
+            data-cursor-label={t(item.name, locale).toUpperCase()}
+          >
+            <p className="taste-card__tag font-receipt">{t(item.note, locale)}</p>
+            <h3 className="taste-card__name font-condensed">{t(item.name, locale)}</h3>
+            {item.id === "jeera" && (
+              <p className="taste-card__badge font-receipt">{t(copy.ingredients.jeeruBadge, locale)}</p>
+            )}
+          </article>
+        ))}
+      </div>
     </div>
   );
 }
@@ -51,29 +66,12 @@ export function IngredientsSection({ locale }: { locale: Locale }) {
   return (
     <SectionFallback
       id="ingredients"
-      aria-label="Ingredients"
-      className="relative border-t border-line/50 bg-paper"
-      tier0={
-        <>
-          <IngredientsCopy locale={locale} />
-          <IngredientCollage animated={false} />
-        </>
-      }
-      tier1={
-        <>
-          <IngredientsCopy locale={locale} />
-          <IngredientCollage animated />
-        </>
-      }
-      tier2={
-        <>
-          <IngredientsCopy locale={locale} />
-          <IngredientCollage animated />
-          <p className="font-label pb-8 text-center text-[9px] text-ink/50">
-            Tier 2 · particle field — Phase 1.6
-          </p>
-        </>
-      }
+      scene="taste"
+      aria-label="J by Jeeru taste"
+      className="relative overflow-hidden text-scene-ink"
+      tier0={<IngredientsPanel locale={locale} animated={false} />}
+      tier1={<IngredientsPanel locale={locale} animated />}
+      tier2={<IngredientsPanel locale={locale} animated />}
     />
   );
 }
