@@ -71,6 +71,7 @@ export function SiteHeader({
           <Link
             href="#product"
             className={onDarkHero ? "btn-pop hidden sm:inline-flex" : "btn-primary hidden sm:inline-flex"}
+            data-cursor-label="MEET J"
           >
             {t(copy.header.cta, locale)}
           </Link>

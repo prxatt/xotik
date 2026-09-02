@@ -18,8 +18,8 @@ export const copy = {
     { id: "factory", label: { en: "Factory", hinglish: "Factory" } },
     { id: "product", label: { en: "J", hinglish: "J" } },
     { id: "ingredients", label: { en: "Taste", hinglish: "Taste" } },
-    { id: "attitude", label: { en: "Attitude", hinglish: "Swag" } },
-    { id: "find", label: { en: "Find", hinglish: "Find" } },
+    { id: "manifesto", label: { en: "Attitude", hinglish: "Swag" } },
+    { id: "find-j", label: { en: "Find", hinglish: "Find" } },
   ],
   hero: {
     devanagariAccent: "जेब में J",
@@ -67,18 +67,53 @@ export const copy = {
       hinglish: "Garam batch · Saf quality · Door tak ready",
     },
   },
+  ingredients: {
+    headline: {
+      en: ["JEERA.", "APPLE.", "SPICE.", "FIZZ."],
+      hinglish: ["JEERA.", "SEB.", "MASALA.", "FIZZ."],
+    },
+    items: [
+      {
+        id: "jeera",
+        name: { en: "Jeera", hinglish: "Jeera" },
+        note: { en: "Masala soul", hinglish: "Masala ki jaan" },
+        bg: "#6b8e4e",
+        ink: "#e5a020",
+      },
+      {
+        id: "apple",
+        name: { en: "Apple", hinglish: "Seb" },
+        note: { en: "Fruit base", hinglish: "Fruit ka base" },
+        bg: "#2d5be3",
+        ink: "#ffe94a",
+      },
+      {
+        id: "spice",
+        name: { en: "Spice", hinglish: "Masala" },
+        note: { en: "Gully kick", hinglish: "Gully wala kick" },
+        bg: "#c45a2c",
+        ink: "#fff9e9",
+      },
+      {
+        id: "fizz",
+        name: { en: "Fizz", hinglish: "Fizz" },
+        note: { en: "Full scene", hinglish: "Poora scene" },
+        bg: "#ff2d95",
+        ink: "#040011",
+      },
+    ],
+  },
   product: {
     headline: { en: "MEET J.", hinglish: "MIL J." },
     body: {
       en: ["FIZZY.", "MASALA.", "VERY J."],
       hinglish: ["FULL FIZZ.", "MASALA KICK.", "BOHOT J."],
     },
-  },
-  ingredients: {
-    headline: {
-      en: ["JEERA.", "APPLE.", "SPICE.", "FIZZ."],
-      hinglish: ["JEERA.", "SEB.", "MASALA.", "FIZZ."],
-    },
+    variants: [
+      { id: "jeeru", label: { en: "Jeeru Masala", hinglish: "Jeeru Masala" } },
+      { id: "cola", label: { en: "Xotik Cola", hinglish: "Xotik Cola" } },
+      { id: "lemon", label: { en: "Clear Lemon", hinglish: "Clear Lemon" } },
+    ],
   },
   manifesto: {
     headline: {

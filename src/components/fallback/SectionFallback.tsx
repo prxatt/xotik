@@ -13,6 +13,7 @@ export type TierVariants = {
 type SectionFallbackProps = TierVariants & {
   id?: string;
   className?: string;
+  scene?: string;
   "aria-label"?: string;
 };
 
@@ -29,6 +30,7 @@ function pickVariant(tier: CapabilityTier, variants: TierVariants): ReactNode {
 export function SectionFallback({
   id,
   className = "",
+  scene,
   "aria-label": ariaLabel,
   tier0,
   tier1,
@@ -37,7 +39,12 @@ export function SectionFallback({
   const { tier } = useCapabilityTierContext();
 
   return (
-    <section id={id} className={className} aria-label={ariaLabel}>
+    <section
+      id={id}
+      className={`${scene ? "scene-shell texture-grain" : ""} ${className}`}
+      data-scene={scene}
+      aria-label={ariaLabel}
+    >
       {pickVariant(tier, { tier0, tier1, tier2 })}
     </section>
   );

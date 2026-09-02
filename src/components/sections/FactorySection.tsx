@@ -9,8 +9,9 @@ export function FactorySection({ locale }: { locale: Locale }) {
   return (
     <SectionFallback
       id="factory"
+      scene="factory"
       aria-label="Manufacturing"
-      className="relative min-h-[80dvh] overflow-hidden border-t border-line/50"
+      className="relative min-h-[80dvh] overflow-hidden border-t border-line/50 text-scene-ink"
       tier0={
         <>
           <FactoryVisual variant="static" />

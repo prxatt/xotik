@@ -11,7 +11,8 @@ export function StreetStatic({ locale }: { locale: Locale }) {
     <section
       id="street"
       aria-label="Indian street scene"
-      className="relative min-h-[100dvh]"
+      className="scene-shell relative min-h-[100dvh]"
+      data-scene="street"
     >
       <div className="absolute inset-0">
         <StreetSeaImage priority />
@@ -27,7 +28,8 @@ export function StreetStaticLayered({ locale }: { locale: Locale }) {
     <section
       id="street"
       aria-label="Indian street scene"
-      className="relative min-h-[100dvh]"
+      className="scene-shell relative min-h-[100dvh]"
+      data-scene="street"
     >
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute inset-0 scale-105">

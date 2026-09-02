@@ -205,7 +205,7 @@ export function HeroKineticScene({ locale, tier }: HeroKineticSceneProps) {
           subRef={subRef}
           ctaRef={ctaRef}
           cta={
-            <Link href="#product" className="btn-pop">
+            <Link href="#product" className="btn-pop" data-cursor-label="MEET J">
               {t(copy.hero.cta, locale)}
             </Link>
           }
