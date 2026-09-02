@@ -1,12 +1,14 @@
 @import "tailwindcss";
 
-/* ── Xotik / J design tokens (Phase 0.2) ── */
+/* ── Xotik / J design tokens ── */
 :root {
+  /* Structural (CTA + footer) */
   --paper: #fff9e9;
   --ink: #173f2c;
   --white: #ffffff;
   --line: #d7d0bf;
 
+  /* J spectrum */
   --j-coral: #e84a3a;
   --j-orange: #f28c28;
   --j-yellow: #f3c743;
@@ -14,10 +16,58 @@
   --j-blue: #2d5be3;
   --j-violet: #ae3fb6;
 
+  /* Scene palettes (Phase 1.5a) */
+  --scene-street-bg: #c45a2c;
+  --scene-street-surface: #e99d25;
+  --scene-street-ink: #1a0f08;
+  --scene-street-accent: #ba0101;
+
+  --scene-factory-bg: #5c636b;
+  --scene-factory-surface: #d4d8dc;
+  --scene-factory-ink: #040011;
+  --scene-factory-accent: #2860c8;
+
+  --scene-product-bg: #2d5be3;
+  --scene-product-surface: #f3c743;
+  --scene-product-ink: #040011;
+
+  --scene-taste-bg: #6b8e4e;
+  --scene-taste-surface: #e5a020;
+  --scene-taste-ink: #1a0f08;
+
+  --scene-manifesto-bg: #040011;
+  --scene-manifesto-ink: #fff9e9;
+  --scene-manifesto-accent: #ba0101;
+  --scene-manifesto-gold: #e99d25;
+
+  --scene-cta-bg: #fff9e9;
+  --scene-cta-ink: #173f2c;
+
+  /* Retro 70s earth + pop */
+  --retro-mustard: #e5a020;
+  --retro-terracotta: #c45a2c;
+  --retro-avocado: #6b8e4e;
+  --retro-royal: #2860c8;
+  --retro-fuchsia: #c43a7a;
+  --retro-petrol: #1e4d6b;
+
+  /* Cinematic accents (In the Mood for Love) */
+  --cine-jaguar: #040011;
+  --cine-red: #ba0101;
+  --cine-gold: #e99d25;
+  --cine-olive: #add794;
+
   --header-solid: rgb(255 249 233 / 0.92);
   --section-pad-x: 20px;
   --section-pad-x-desktop: 32px;
   --radius-pill: 100px;
+  --radius-stamp: 4px;
+
+  /* Scene context defaults (overridden by .scene-shell[data-scene]) */
+  --scene-bg: var(--paper);
+  --scene-ink: var(--ink);
+  --scene-surface: var(--paper);
+  --scene-accent: var(--j-coral);
 }
 
 @theme inline {
@@ -31,11 +81,22 @@
   --color-j-green: var(--j-green);
   --color-j-blue: var(--j-blue);
   --color-j-violet: var(--j-violet);
+  --color-cine-jaguar: var(--cine-jaguar);
+  --color-cine-red: var(--cine-red);
+  --color-cine-gold: var(--cine-gold);
+  --color-cine-olive: var(--cine-olive);
+  --color-retro-royal: var(--retro-royal);
+  --color-scene-bg: var(--scene-bg);
+  --color-scene-ink: var(--scene-ink);
+  --color-scene-surface: var(--scene-surface);
+  --color-scene-accent: var(--scene-accent);
 
   --font-display: var(--font-fraunces);
+  --font-condensed: var(--font-bebas);
   --font-body: var(--font-manrope);
   --font-label: var(--font-ibm-plex-mono);
   --font-hindi: var(--font-noto-devanagari);
+  --font-receipt: var(--font-ibm-plex-mono);
 }
 
 html {
@@ -77,6 +138,147 @@ body {
 
 .font-hindi {
   font-family: var(--font-noto-devanagari), var(--font-manrope), sans-serif;
+}
+
+/* Phase 1.5a — mixed type stack */
+.font-condensed {
+  font-family: var(--font-bebas), Impact, sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 0.88;
+}
+
+.font-devanagari-display {
+  font-family: var(--font-noto-devanagari), sans-serif;
+  font-weight: 700;
+  line-height: 0.95;
+}
+
+.font-receipt {
+  font-family: var(--font-ibm-plex-mono), ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Scene shell — apply to section roots in Phase 1.7 */
+.scene-shell {
+  position: relative;
+  background-color: var(--scene-bg, var(--paper));
+}
+
+.scene-shell[data-scene="street"] {
+  --scene-bg: var(--scene-street-bg);
+  --scene-ink: var(--scene-street-ink);
+  --scene-accent: var(--scene-street-accent);
+  --scene-surface: var(--scene-street-surface);
+}
+
+.scene-shell[data-scene="factory"] {
+  --scene-bg: var(--scene-factory-bg);
+  --scene-ink: var(--scene-factory-ink);
+  --scene-accent: var(--scene-factory-accent);
+  --scene-surface: var(--scene-factory-surface);
+}
+
+.scene-shell[data-scene="product"] {
+  --scene-bg: var(--scene-product-bg);
+  --scene-ink: var(--scene-product-ink);
+  --scene-accent: var(--j-coral);
+  --scene-surface: var(--scene-product-surface);
+}
+
+.scene-shell[data-scene="taste"] {
+  --scene-bg: var(--scene-taste-bg);
+  --scene-ink: var(--scene-taste-ink);
+  --scene-accent: var(--retro-fuchsia);
+  --scene-surface: var(--scene-taste-surface);
+}
+
+.scene-shell[data-scene="manifesto"] {
+  --scene-bg: var(--scene-manifesto-bg);
+  --scene-ink: var(--scene-manifesto-ink);
+  --scene-accent: var(--scene-manifesto-accent);
+  --scene-surface: var(--scene-manifesto-gold);
+}
+
+.scene-shell[data-scene="cta"] {
+  --scene-bg: var(--scene-cta-bg);
+  --scene-ink: var(--scene-cta-ink);
+  --scene-accent: var(--j-blue);
+  --scene-surface: var(--paper);
+}
+
+/* Surface textures */
+.texture-grain {
+  position: relative;
+  isolation: isolate;
+}
+
+.texture-grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.14;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+}
+
+.texture-halftone {
+  background-image: radial-gradient(circle, currentColor 0.6px, transparent 0.6px);
+  background-size: 5px 5px;
+}
+
+.stamp-edge {
+  border: 2px solid currentColor;
+  border-radius: var(--radius-stamp);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, currentColor 30%, transparent),
+    3px 3px 0 0 color-mix(in srgb, currentColor 55%, transparent);
+}
+
+.sunburst-mark {
+  background: conic-gradient(
+    from 0deg,
+    currentColor 0deg 12deg,
+    transparent 12deg 24deg
+  );
+  mask: radial-gradient(circle, transparent 42%, black 43%);
+}
+
+/* Desi pop CTA variant */
+.btn-pop {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 14px 28px;
+  border-radius: var(--radius-pill);
+  background: var(--cine-red);
+  color: var(--scene-manifesto-ink);
+  font-family: var(--font-bebas), Impact, sans-serif;
+  font-size: 1.125rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 2px solid var(--scene-manifesto-ink);
+  box-shadow: 4px 4px 0 0 var(--cine-jaguar);
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.btn-pop:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 0 var(--cine-jaguar);
+}
+
+.btn-pop:focus-visible {
+  outline: 2px solid var(--cine-gold);
+  outline-offset: 3px;
 }
 
 /* Primary CTA */

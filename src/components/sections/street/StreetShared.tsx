@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { copy, tLines, type Locale } from "@/lib/copy";
+import { copy, t, tLines, type Locale } from "@/lib/copy";
 
 export const STREET_SEA = "/assets/hero/street-sea-link.jpg";
 export const STREET_MONSOON = "/assets/hero/street-monsoon-market.jpg";
@@ -26,7 +26,7 @@ export function StreetCopy({ locale }: { locale: Locale }) {
           </span>
         ))}
       </h2>
-      <p className="font-label mt-8 text-[10px] text-ink/50">Scroll ↓</p>
+      <p className="font-label mt-8 text-[10px] text-ink/50">{t(copy.street.scroll, locale)}</p>
     </div>
   );
 }

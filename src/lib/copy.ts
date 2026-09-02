@@ -2,9 +2,9 @@ export type Locale = "en" | "hinglish";
 
 export const copy = {
   meta: {
-    title: "J by Jeeru | Xotik Frujus",
+    title: "J by Jeeru | Pocket-Sized Pride",
     description:
-      "Tastes like India. Feels like J. Apple-juice-based fizzy masala drink from Xotik Frujus.",
+      "Apple juice. Masala fizz. Very desi. Very J. The fizzy masala drink from Xotik Frujus.",
   },
   header: {
     logo: "J",
@@ -14,69 +14,75 @@ export const copy = {
     language: { en: "EN", hinglish: "HI" },
   },
   chapters: [
-    { id: "street", label: { en: "Street", hinglish: "Street" } },
+    { id: "street", label: { en: "Street", hinglish: "Gully" } },
     { id: "factory", label: { en: "Factory", hinglish: "Factory" } },
     { id: "product", label: { en: "J", hinglish: "J" } },
     { id: "ingredients", label: { en: "Taste", hinglish: "Taste" } },
-    { id: "attitude", label: { en: "Attitude", hinglish: "Attitude" } },
+    { id: "attitude", label: { en: "Attitude", hinglish: "Swag" } },
     { id: "find", label: { en: "Find", hinglish: "Find" } },
   ],
   hero: {
     headline: {
-      en: ["Tastes like India.", "Feels like J."],
-      hinglish: ["India ka taste.", "J ka mood."],
+      en: ["POCKET-SIZED", "PRIDE."],
+      hinglish: ["जेब में J.", "FULL scene."],
     },
     cta: { en: "Meet J", hinglish: "Mil J" },
     sub: {
-      en: "Apple-juice-based fizzy masala drink from Xotik Frujus.",
-      hinglish: "Xotik Frujus ka apple-based fizzy masala drink.",
+      en: "Apple juice. Masala fizz. Very desi. Very J.",
+      hinglish: "Apple ka twist. Masala ka kick. Poora fizz. Poora scene.",
     },
   },
   street: {
     headline: {
-      en: ["India doesn't need another flavour.", "It needs more flavour."],
+      en: ["GULLY CRICKET", "KE BAAD.", "FULL FLAVOUR."],
       hinglish: [
-        "India ko ek aur flavour nahi chahiye.",
-        "India already full flavour hai.",
+        "Gully cricket ke baad,",
+        "cycle ride ke baad,",
+        "bas J chahiye.",
       ],
     },
+    scroll: { en: "Scroll ↓", hinglish: "Neeche ↓" },
   },
   factory: {
     headline: {
-      en: ["Big taste.", "Made the modern way."],
-      hinglish: ["Bada taste.", "Modern tareeke se bana."],
+      en: ["BIG TASTE.", "MODERN LINE."],
+      hinglish: ["Bada swaad.", "Nayi machine."],
     },
     micro: {
-      en: "Automatic production. Strict quality controls. Built to travel.",
-      hinglish: "Automatic production. Strict quality controls. Built to travel.",
+      en: "Warm batch · Strict QC · Built to travel",
+      hinglish: "Garam batch · Saf quality · Door tak ready",
     },
   },
   product: {
-    headline: { en: "Meet J.", hinglish: "Mil J." },
+    headline: { en: "MEET J.", hinglish: "MIL J." },
     body: {
-      en: ["Apple juice based.", "Fizzy.", "Masala.", "Very J."],
-      hinglish: ["Apple ka twist.", "Masala ka kick.", "Full fizz."],
+      en: ["FIZZY.", "MASALA.", "VERY J."],
+      hinglish: ["FULL FIZZ.", "MASALA KICK.", "BOHOT J."],
     },
   },
   ingredients: {
     headline: {
-      en: ["Jeera.", "Apple.", "Spice.", "Fizz."],
-      hinglish: ["Jeera.", "Seb.", "Masala.", "Full fizz."],
+      en: ["JEERA.", "APPLE.", "SPICE.", "FIZZ."],
+      hinglish: ["JEERA.", "SEB.", "MASALA.", "FIZZ."],
     },
   },
   manifesto: {
     headline: {
-      en: ["Six colours.", "One attitude."],
-      hinglish: ["Chhe colours.", "Ek attitude."],
+      en: ["SIX COLOURS.", "ONE ATTITUDE."],
+      hinglish: ["CHHE RANG.", "EK SWAG."],
     },
     sub: {
-      en: ["Born Indian.", "Made to go everywhere."],
-      hinglish: ["Desi dil.", "Global scene."],
+      en: ["DESI BORN.", "GO EVERYWHERE."],
+      hinglish: ["DESI DIL.", "GLOBAL SCENE."],
     },
   },
   cta: {
-    primary: { en: "Find J near you", hinglish: "J paas mein kahan milega?" },
-    secondary: { en: "Explore Xotik", hinglish: "Explore Xotik" },
+    primary: { en: "Find J near you", hinglish: "J kahan milega?" },
+    secondary: { en: "The Xotik story", hinglish: "Xotik ki baat" },
+    stores: {
+      en: "Full store map launches in Phase 2. For now, reach us to find J near you.",
+      hinglish: "Store map Phase 2 mein. Abhi J dhundhne ke liye humse baat karo.",
+    },
   },
   footer: {
     parent: "Xotik Frujus Pvt Ltd",

@@ -6,29 +6,45 @@ globs:
 alwaysApply: false
 ---
 
-# Xotik design system
+# Xotik design system v2
 
-## Colors (use CSS variables only)
+## Aesthetic north star
+
+Desi Pop Billboard (primary) + Vintage Indian Print + Cinematic mood. Loud, tactile, graphic — never generic cream SaaS.
+
+## Colors
 
 - Structural: `--paper`, `--ink`, `--line`, `--white`
-- J spectrum: `--j-coral` through `--j-violet` — one dominant accent per scene, never all six as a rainbow gradient
+- J spectrum: `--j-coral` through `--j-violet` — one dominant per scene, full-bleed fields not tiny dots
+- Scene palettes: `--scene-street-*`, `--scene-factory-*`, `--scene-product-*`, `--scene-taste-*`, `--scene-manifesto-*`, `--scene-cta-*`
+- Retro 70s: `--retro-mustard`, `--retro-terracotta`, `--retro-avocado`, `--retro-royal`, `--retro-fuchsia`, `--retro-petrol`
+- Cinematic: `--cine-jaguar`, `--cine-red`, `--cine-gold`, `--cine-olive`
 
-## Typography
+Use `.scene-shell[data-scene="…"]` on section roots. See `src/lib/scene-tokens.ts`.
 
-- Display: Fraunces, roman only (no italic headers)
-- Body: Manrope
-- Labels: IBM Plex Mono, uppercase, letter-spacing 0.08em
-- Hindi: Noto Sans Devanagari subset when locale is hinglish
+## Typography (mixed stack)
 
-## Components
+- Billboard: `.font-condensed` (Bebas Neue) — huge uppercase headlines
+- Devanagari hero: `.font-devanagari-display` — bilingual layers
+- Receipt meta: `.font-receipt` — ingredients, barcodes, batch numbers
+- Body: Manrope · Legacy display: Fraunces (use sparingly post-1.5)
 
-- Primary CTA: `.btn-primary` — ink bg, paper text, pill radius
-- Section padding: 20px mobile, 32px desktop
-- Max content width: 1280px
+## Textures
+
+- `.texture-grain` — paper/print grain overlay
+- `.texture-halftone` — Maaza-style dot pattern
+- `.stamp-edge` — perforated stamp border
+- `.sunburst-mark` — vintage sunburst accent
+
+## CTAs
+
+- `.btn-primary` — classic ink/pill (footer, subtle actions)
+- `.btn-pop` — desi pop shadow button (hero, pitch moments)
 
 ## Do not
 
-- Introduce colors outside the token set without adding a named variable
-- Use generic AI dashboard patterns (purple gradients, glass blobs)
+- Default every section to cream `--paper` background
+- Use polite brochure copy — write billboard punch + gully hinglish
 - Invent metrics, press quotes, or certification claims
 - Copy user reference art pixels — mood and palette only
+- AI-generate label text — use approved artwork only on 3D models
