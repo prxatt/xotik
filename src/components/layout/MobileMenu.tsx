@@ -5,6 +5,7 @@ import { useEffect, useId, useRef } from "react";
 import { copy, t } from "@/lib/copy";
 import { useLanguage } from "@/context/LanguageContext";
 import { MOBILE_MENU_ID } from "@/components/layout/SiteHeader";
+import { DESKTOP_MENU_MQ } from "@/lib/breakpoints";
 import type { RefObject } from "react";
 
 type MobileMenuProps = {
@@ -22,9 +23,6 @@ const links = [
 
 const FOCUSABLE =
   'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
-
-/** Tailwind `md` — menu is mobile-only; close + release scroll lock past this width. */
-const DESKTOP_MENU_MQ = "(min-width: 768px)";
 
 export function MobileMenu({ open, onClose, returnFocusRef }: MobileMenuProps) {
   const { locale } = useLanguage();

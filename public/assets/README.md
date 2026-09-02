@@ -6,9 +6,8 @@ Phase 0.4 folder structure. Mark status as assets arrive.
 
 | File | Status | Notes |
 |------|--------|-------|
-| street-layer-fg.webp | placeholder | Stylized Indian street foreground |
-| street-layer-mid.webp | placeholder | Buildings / rickshaw silhouettes |
-| street-layer-bg.webp | placeholder | Sky / distant palms |
+| street-sea-link.jpg | **ready** | Sea Link / cricket street — Tier 0/2 hero |
+| street-monsoon-market.jpg | **ready** | Monsoon market — Tier 1 parallax layer |
 | factory-still.webp | placeholder | Manufacturing mood still |
 | hero-tier0.avif | placeholder | Static fallback for Tier 0 |
 

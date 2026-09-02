@@ -108,3 +108,33 @@ body {
   outline: 2px solid var(--j-blue);
   outline-offset: 3px;
 }
+
+@keyframes street-drift {
+  from {
+    transform: translate3d(0, 0, 0) scale(1.02);
+  }
+  to {
+    transform: translate3d(0, -1.5%, 0) scale(1.04);
+  }
+}
+
+@keyframes factory-scan {
+  0% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.05);
+  }
+  100% {
+    filter: brightness(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-safe\:animate-\[street-drift_24s_ease-in-out_infinite_alternate\],
+  .motion-safe\:animate-\[street-drift_30s_ease-in-out_infinite_alternate-reverse\],
+  .motion-safe\:animate-pulse,
+  .motion-safe\:animate-\[factory-scan_4s_linear_infinite\] {
+    animation: none !important;
+  }
+}
