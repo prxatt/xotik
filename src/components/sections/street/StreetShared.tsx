@@ -44,12 +44,13 @@ export function StreetSeaImage({ priority = false }: { priority?: boolean }) {
   );
 }
 
-export function StreetMonsoonImage() {
+export function StreetMonsoonImage({ priority = false }: { priority?: boolean }) {
   return (
     <Image
       src={STREET_MONSOON}
       alt=""
       fill
+      priority={priority}
       className="object-cover object-center"
       sizes="100vw"
     />

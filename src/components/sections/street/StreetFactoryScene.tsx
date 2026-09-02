@@ -22,12 +22,15 @@ type StreetFactorySceneProps = {
   tier: 1 | 2;
 };
 
+/** Normalized timeline length — hold after crossfade keeps factory visible before unpin. */
+const TIMELINE_END = 1;
+
 const SCENE = {
   1: {
     totalVh: 260,
-    parallaxEnd: 0.615,
-    crossfadeStart: 0.55,
-    crossfadeEnd: 0.92,
+    parallaxEnd: 0.52,
+    crossfadeStart: 0.52,
+    crossfadeComplete: 0.68,
     bgInset: "18%",
     fgInset: "22%",
     bgY: { from: -2, to: 7 },
@@ -38,9 +41,9 @@ const SCENE = {
   },
   2: {
     totalVh: 340,
-    parallaxEnd: 0.647,
-    crossfadeStart: 0.58,
-    crossfadeEnd: 0.9,
+    parallaxEnd: 0.55,
+    crossfadeStart: 0.55,
+    crossfadeComplete: 0.7,
     bgInset: "20%",
     fgInset: "26%",
     bgY: { from: -3, to: 10 },
@@ -51,22 +54,25 @@ const SCENE = {
   },
 } as const;
 
-function waitForImages(container: HTMLElement): Promise<void> {
+function refreshAfterImages(container: HTMLElement): Promise<void> {
   const images = Array.from(container.querySelectorAll("img"));
   if (images.length === 0) return Promise.resolve();
 
-  return Promise.all(
-    images.map(
-      (img) =>
-        new Promise<void>((resolve) => {
-          if (img.complete) resolve();
-          else {
-            img.addEventListener("load", () => resolve(), { once: true });
-            img.addEventListener("error", () => resolve(), { once: true });
-          }
-        }),
-    ),
-  ).then(() => undefined);
+  return Promise.race([
+    Promise.all(
+      images.map(
+        (img) =>
+          new Promise<void>((resolve) => {
+            if (img.complete) resolve();
+            else {
+              img.addEventListener("load", () => resolve(), { once: true });
+              img.addEventListener("error", () => resolve(), { once: true });
+            }
+          }),
+      ),
+    ).then(() => undefined),
+    new Promise<void>((resolve) => window.setTimeout(resolve, 1200)),
+  ]);
 }
 
 export function StreetFactoryScene({ locale, tier }: StreetFactorySceneProps) {
@@ -80,6 +86,7 @@ export function StreetFactoryScene({ locale, tier }: StreetFactorySceneProps) {
   const config = SCENE[tier];
 
   useEffect(() => {
+    const scene = SCENE[tier];
     const root = rootRef.current;
     const streetGroup = streetGroupRef.current;
     const bg = bgRef.current;
@@ -98,86 +105,90 @@ export function StreetFactoryScene({ locale, tier }: StreetFactorySceneProps) {
     let ctx: gsap.Context | null = null;
     let cancelled = false;
 
-    waitForImages(root).then(() => {
-      if (cancelled) return;
+    ctx = gsap.context(() => {
+      const crossfadeDuration = scene.crossfadeComplete - scene.crossfadeStart;
 
-      ctx = gsap.context(() => {
-        const crossfadeDuration = config.crossfadeEnd - config.crossfadeStart;
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: root,
+          start: "top top",
+          end: "bottom bottom",
+          scrub: scene.scrub,
+          invalidateOnRefresh: true,
+        },
+      });
 
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: root,
-            start: "top top",
-            end: "bottom bottom",
-            scrub: config.scrub,
-            invalidateOnRefresh: true,
-          },
-        });
+      tl.fromTo(
+        bg,
+        { yPercent: scene.bgY.from },
+        { yPercent: scene.bgY.to, ease: "none", duration: scene.parallaxEnd },
+        0,
+      );
 
-        tl.fromTo(
-          bg,
-          { yPercent: config.bgY.from },
-          { yPercent: config.bgY.to, ease: "none", duration: config.parallaxEnd },
-          0,
-        );
+      tl.fromTo(
+        fg,
+        { yPercent: scene.fgY.from },
+        { yPercent: scene.fgY.to, ease: "none", duration: scene.parallaxEnd },
+        0,
+      );
 
-        tl.fromTo(
-          fg,
-          { yPercent: config.fgY.from },
-          { yPercent: config.fgY.to, ease: "none", duration: config.parallaxEnd },
-          0,
-        );
+      tl.fromTo(
+        streetCopy,
+        { yPercent: 0, opacity: 1 },
+        {
+          yPercent: scene.streetCopyY,
+          opacity: tier === 2 ? 0.88 : 0.94,
+          ease: "none",
+          duration: scene.parallaxEnd,
+        },
+        0,
+      );
 
-        tl.fromTo(
-          streetCopy,
-          { yPercent: 0, opacity: 1 },
-          {
-            yPercent: config.streetCopyY,
-            opacity: tier === 2 ? 0.88 : 0.94,
-            ease: "none",
-            duration: config.parallaxEnd,
-          },
-          0,
-        );
+      tl.to(
+        streetGroup,
+        {
+          opacity: 0,
+          filter: "blur(6px)",
+          ease: "none",
+          duration: crossfadeDuration,
+        },
+        scene.crossfadeStart,
+      );
 
-        tl.to(
-          streetGroup,
-          {
-            opacity: 0,
-            filter: "blur(6px)",
-            ease: "none",
-            duration: crossfadeDuration,
-          },
-          config.crossfadeStart,
-        );
+      tl.to(
+        factoryGroup,
+        { opacity: 1, ease: "none", duration: crossfadeDuration },
+        scene.crossfadeStart,
+      );
 
-        tl.to(
-          factoryGroup,
-          { opacity: 1, ease: "none", duration: crossfadeDuration },
-          config.crossfadeStart,
-        );
+      tl.fromTo(
+        factoryCopy,
+        { y: 40, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          ease: "none",
+          duration: crossfadeDuration * 0.75,
+        },
+        scene.crossfadeStart + crossfadeDuration * 0.2,
+      );
 
-        tl.fromTo(
-          factoryCopy,
-          { y: 40, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            ease: "none",
-            duration: crossfadeDuration * 0.75,
-          },
-          config.crossfadeStart + crossfadeDuration * 0.2,
-        );
-      }, root);
+      tl.to(
+        {},
+        { duration: TIMELINE_END - scene.crossfadeComplete, ease: "none" },
+        scene.crossfadeComplete,
+      );
+    }, root);
 
-      ScrollTrigger.refresh();
+    refreshAfterImages(root).then(() => {
+      if (!cancelled) ScrollTrigger.refresh();
     });
 
     return () => {
       cancelled = true;
       ctx?.revert();
     };
-  }, [tier, config]);
+  }, [tier]);
 
   return (
     <section
@@ -220,7 +231,7 @@ export function StreetFactoryScene({ locale, tier }: StreetFactorySceneProps) {
             }}
             aria-hidden
           >
-            <StreetMonsoonImage />
+            <StreetMonsoonImage priority />
           </div>
 
           <StreetOverlay />
@@ -232,7 +243,6 @@ export function StreetFactoryScene({ locale, tier }: StreetFactorySceneProps) {
 
         <div
           ref={factoryCopyRef}
-          id="factory"
           className="pointer-events-none absolute inset-0 z-20 opacity-0"
         >
           <FactoryCopy locale={locale} />
@@ -244,6 +254,17 @@ export function StreetFactoryScene({ locale, tier }: StreetFactorySceneProps) {
           </p>
         )}
       </div>
+
+      <div
+        id="factory"
+        tabIndex={-1}
+        className="pointer-events-none absolute left-0 h-px w-px opacity-0"
+        style={{
+          top: `${config.crossfadeComplete * 100}%`,
+          scrollMarginTop: "5rem",
+        }}
+        aria-label="Factory"
+      />
     </section>
   );
 }
