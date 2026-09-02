@@ -23,6 +23,9 @@ const links = [
 const FOCUSABLE =
   'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
+/** Tailwind `md` — menu is mobile-only; close + release scroll lock past this width. */
+const DESKTOP_MENU_MQ = "(min-width: 768px)";
+
 export function MobileMenu({ open, onClose, returnFocusRef }: MobileMenuProps) {
   const { locale } = useLanguage();
   const titleId = useId();
@@ -31,6 +34,25 @@ export function MobileMenu({ open, onClose, returnFocusRef }: MobileMenuProps) {
 
   useEffect(() => {
     if (!open) return;
+
+    const desktopMq = window.matchMedia(DESKTOP_MENU_MQ);
+
+    function closeOnDesktop(event: MediaQueryListEvent) {
+      if (event.matches) onClose();
+    }
+
+    if (desktopMq.matches) {
+      onClose();
+      return;
+    }
+
+    desktopMq.addEventListener("change", closeOnDesktop);
+    return () => desktopMq.removeEventListener("change", closeOnDesktop);
+  }, [open, onClose]);
+
+  useEffect(() => {
+    if (!open) return;
+    if (window.matchMedia(DESKTOP_MENU_MQ).matches) return;
 
     const previousFocus = document.activeElement as HTMLElement | null;
     const menuButton = returnFocusRef?.current ?? null;
