@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import {
+  Bebas_Neue,
   Fraunces,
   IBM_Plex_Mono,
   Manrope,
@@ -8,6 +9,12 @@ import {
 import { AppProviders } from "@/components/providers/AppProviders";
 import { copy } from "@/lib/copy";
 import "./globals.css";
+
+const bebasNeue = Bebas_Neue({
+  variable: "--font-bebas",
+  subsets: ["latin"],
+  weight: "400",
+});
 
 const fraunces = Fraunces({
   variable: "--font-fraunces",
@@ -46,7 +53,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${fraunces.variable} ${manrope.variable} ${ibmPlexMono.variable} ${notoDevanagari.variable} antialiased`}
+        className={`${bebasNeue.variable} ${fraunces.variable} ${manrope.variable} ${ibmPlexMono.variable} ${notoDevanagari.variable} antialiased`}
       >
         <AppProviders>{children}</AppProviders>
       </body>
