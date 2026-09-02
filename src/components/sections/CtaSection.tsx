@@ -25,11 +25,7 @@ function CtaContent({ locale }: { locale: Locale }) {
         className="font-body mx-auto mt-12 max-w-md rounded-2xl border border-line bg-white px-6 py-5 text-sm text-ink/75"
       >
         <p className="font-label mb-2 text-[10px] text-j-green">Store locator</p>
-        <p>
-          {locale === "en"
-            ? "Full store map launches in Phase 2. For now, reach us to find J near you."
-            : "Full store map Phase 2 mein aayega. Abhi J dhundhne ke liye contact karo."}
-        </p>
+        <p>{t(copy.cta.stores, locale)}</p>
         <a
           href={`mailto:${copy.footer.email}`}
           className="mt-3 inline-block font-medium text-ink underline-offset-2 hover:underline"
