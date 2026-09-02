@@ -37,4 +37,4 @@ See `public/assets/README.md` for the asset inventory and status.
 
 - **Phase 0** — Foundation (main)
 - **Phase 1.1** — Static shell + header (PR)
-- **Phase 1.2+** — Tier fallbacks, street scene, product 3D…
+- **Phase 1.3** — GSAP scroll parallax on street section (Tier 1/2)
