@@ -62,6 +62,12 @@
   --section-pad-x-desktop: 32px;
   --radius-pill: 100px;
   --radius-stamp: 4px;
+
+  /* Scene context defaults (overridden by .scene-shell[data-scene]) */
+  --scene-bg: var(--paper);
+  --scene-ink: var(--ink);
+  --scene-surface: var(--paper);
+  --scene-accent: var(--j-coral);
 }
 
 @theme inline {
@@ -161,7 +167,6 @@ body {
 /* Scene shell — apply to section roots in Phase 1.7 */
 .scene-shell {
   position: relative;
-  color: var(--scene-ink, var(--ink));
   background-color: var(--scene-bg, var(--paper));
 }
 
