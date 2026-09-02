@@ -27,12 +27,12 @@ export const copy = {
       en: ["POCKET-SIZED", "PRIDE."],
       hinglish: ["जेब में J.", "FULL scene."],
     },
-    receipt: { en: "01 · J · Xotik Frujus", hinglish: "01 · J · Xotik Frujus" },
+    receipt: { en: "01 · J · Xotik Frujus", hinglish: "01 · J · Poora scene" },
     ribbon: "J BY JEERU · XOTIK FRUJUS · DESI POP · ",
     garnish: {
       top: {
         en: "Gully cricket ke baad, cycle ride ke baad.",
-        hinglish: "Gully cricket ke baad, cycle ride ke baad.",
+        hinglish: "Gully cricket ke baad, cycle chala ke baad.",
       },
       box: {
         en: "Before fancy drinks… there was J.",
@@ -68,10 +68,16 @@ export const copy = {
     },
   },
   ingredients: {
+    eyebrow: { en: "TASTE · XOTIK FRUJUS", hinglish: "SWAAD · XOTIK FRUJUS" },
     headline: {
       en: ["JEERA.", "APPLE.", "SPICE.", "FIZZ."],
       hinglish: ["JEERA.", "SEB.", "MASALA.", "FIZZ."],
     },
+    lead: {
+      en: "Everyone knows Jeeru. This is the masala soul inside every sip of J.",
+      hinglish: "Sabko Jeeru pata hai. Har sip mein yahi masala ki jaan hai.",
+    },
+    jeeruBadge: { en: "★ THE ONE THEY KNOW", hinglish: "★ JO SAB JAANTE HAIN" },
     items: [
       {
         id: "jeera",
@@ -104,11 +110,17 @@ export const copy = {
     ],
   },
   product: {
+    eyebrow: { en: "J BY JEERU", hinglish: "J BY JEERU" },
     headline: { en: "MEET J.", hinglish: "MIL J." },
+    lead: {
+      en: "The masala fizz everyone already knows — now pocket-sized.",
+      hinglish: "Wohi masala fizz jo sab jaante hain — ab jeb ke size mein.",
+    },
     body: {
       en: ["FIZZY.", "MASALA.", "VERY J."],
       hinglish: ["FULL FIZZ.", "MASALA KICK.", "BOHOT J."],
     },
+    flagship: { en: "JEERU MASALA · FLAGSHIP CAN", hinglish: "JEERU MASALA · ASLI HERO" },
     variants: [
       { id: "jeeru", label: { en: "Jeeru Masala", hinglish: "Jeeru Masala" } },
       { id: "cola", label: { en: "Xotik Cola", hinglish: "Xotik Cola" } },

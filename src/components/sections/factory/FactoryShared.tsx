@@ -4,9 +4,9 @@ export function FactoryCopy({ locale }: { locale: Locale }) {
   const lines = tLines(copy.factory.headline, locale);
 
   return (
-    <div className="relative z-10 mx-auto flex min-h-[100dvh] w-full max-w-[1280px] flex-col justify-end px-[var(--section-pad-x)] pb-16 pt-24 md:px-[var(--section-pad-x-desktop)] md:pb-24">
-      <p className="font-label mb-4 text-j-blue">02 — Factory</p>
-      <h2 className="font-display max-w-[14ch] text-[clamp(2rem,5vw,3.25rem)] font-bold leading-[0.95] text-ink">
+    <div className="relative z-10 mx-auto flex min-h-[100dvh] w-full max-w-[1280px] flex-col justify-end px-[var(--section-pad-x)] pb-16 pt-28 md:px-[var(--section-pad-x-desktop)] md:pb-24 md:pt-32">
+      <p className="font-receipt mb-4 text-[11px] tracking-[0.2em] text-j-blue">02 — FACTORY</p>
+      <h2 className="font-condensed max-w-[14ch] text-[clamp(2.5rem,8vw,4.25rem)] leading-[0.9] tracking-wide text-ink">
         {lines.map((line) => (
           <span key={line} className="block">
             {line}

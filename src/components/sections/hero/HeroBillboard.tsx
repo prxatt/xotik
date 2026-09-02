@@ -123,7 +123,7 @@ export function HeroBillboardCopy({
       {showDevanagariAccent && (
         <p
           ref={accentRef}
-          className="hero-kinetic-accent font-devanagari-display text-[clamp(2.75rem,12vw,5.5rem)] leading-[1.08] text-hero-ink"
+          className="hero-kinetic-accent font-devanagari-display hidden text-[clamp(2.75rem,12vw,5.5rem)] leading-[1.08] text-hero-ink sm:block"
         >
           {devanagariAccent}
         </p>

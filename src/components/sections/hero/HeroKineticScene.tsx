@@ -46,6 +46,7 @@ const SCENE = {
 } as const;
 
 export function HeroKineticScene({ locale, tier }: HeroKineticSceneProps) {
+  const scene = SCENE[tier];
   const headlines = tLines(copy.hero.headline, locale);
   const rootRef = useRef<HTMLElement>(null);
   const pinRef = useRef<HTMLDivElement>(null);
@@ -179,7 +180,13 @@ export function HeroKineticScene({ locale, tier }: HeroKineticSceneProps) {
   }, [tier, locale]);
 
   return (
-    <section ref={rootRef} id="hero" aria-label="Hero" className="hero-scroll-zone">
+    <section
+      ref={rootRef}
+      id="hero"
+      aria-label="Hero"
+      className="hero-scroll-zone"
+      style={{ minHeight: `${scene.scrollVh}vh` }}
+    >
       <HeroBillboard
         frameRef={pinRef}
         clip={false}

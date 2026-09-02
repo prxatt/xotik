@@ -7,7 +7,7 @@ export const STREET_MONSOON = "/assets/hero/street-monsoon-market.jpg";
 export function StreetOverlay() {
   return (
     <div
-      className="pointer-events-none absolute inset-0 bg-gradient-to-t from-paper via-paper/80 to-paper/20"
+      className="pointer-events-none absolute inset-0 bg-gradient-to-t from-paper/95 via-paper/35 to-transparent"
       aria-hidden
     />
   );
@@ -17,9 +17,9 @@ export function StreetCopy({ locale }: { locale: Locale }) {
   const lines = tLines(copy.street.headline, locale);
 
   return (
-    <div className="relative z-10 mx-auto w-full max-w-[1280px] px-[var(--section-pad-x)] pb-16 pt-24 md:px-[var(--section-pad-x-desktop)] md:pb-24">
-      <p className="font-label mb-4 text-j-coral">01 — Street</p>
-      <h2 className="font-display max-w-[16ch] text-[clamp(2rem,6vw,3.5rem)] font-bold leading-[0.95] text-ink">
+    <div className="relative z-10 mx-auto w-full max-w-[1280px] px-[var(--section-pad-x)] pb-16 pt-28 md:px-[var(--section-pad-x-desktop)] md:pb-24 md:pt-32">
+      <p className="font-receipt mb-4 text-[11px] tracking-[0.2em] text-j-coral">01 — STREET</p>
+      <h2 className="font-condensed max-w-[14ch] text-[clamp(2.5rem,9vw,4.75rem)] leading-[0.9] tracking-wide text-ink">
         {lines.map((line) => (
           <span key={line} className="block">
             {line}

@@ -1,41 +1,65 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { copy } from "@/lib/copy";
 
-const CHAPTER_IDS = copy.chapters.map((chapter) => chapter.id);
+/** Chapter numbers 1–6 map to copy.chapters */
+const SECTION_CHAPTERS: { id: string; chapter: number }[] = [
+  { id: "street", chapter: 1 },
+  { id: "product", chapter: 3 },
+  { id: "ingredients", chapter: 4 },
+  { id: "manifesto", chapter: 5 },
+  { id: "find-j", chapter: 6 },
+];
+
+function focalY() {
+  return window.scrollY + window.innerHeight * 0.38;
+}
 
 /**
- * Tracks which homepage chapter is in view for the header label.
- * Hero = chapter index 0 (not in chapters array — shows street until #street).
+ * Tracks homepage chapter for the header.
+ * Factory (ch.2) is inferred when the in-scene #factory anchor passes the focal line
+ * while #street is still the active scroll region.
  */
 export function useScrollChapter() {
   const [activeChapter, setActiveChapter] = useState(1);
 
   useEffect(() => {
-    const sections = CHAPTER_IDS.map((id) => document.getElementById(id)).filter(
-      Boolean,
-    ) as HTMLElement[];
+    function resolveChapter() {
+      const y = focalY();
 
-    if (sections.length === 0) return;
+      let chapter = 1;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+      for (const section of SECTION_CHAPTERS) {
+        const el = document.getElementById(section.id);
+        if (!el) continue;
+        const top = el.offsetTop;
+        if (y >= top) chapter = section.chapter;
+      }
 
-        if (visible.length === 0) return;
+      if (chapter === 1 || chapter === 2) {
+        const street = document.getElementById("street");
+        const factoryAnchor = document.getElementById("factory");
+        if (street && factoryAnchor) {
+          const streetTop = street.offsetTop;
+          const streetBottom = streetTop + street.offsetHeight;
+          if (y >= streetTop && y < streetBottom) {
+            const anchorY =
+              factoryAnchor.getBoundingClientRect().top + window.scrollY;
+            chapter = y >= anchorY - window.innerHeight * 0.35 ? 2 : 1;
+          }
+        }
+      }
 
-        const id = visible[0].target.id;
-        const index = (CHAPTER_IDS as readonly string[]).indexOf(id);
-        if (index >= 0) setActiveChapter(index + 1);
-      },
-      { rootMargin: "-35% 0px -45% 0px", threshold: [0, 0.15, 0.35, 0.55] },
-    );
+      setActiveChapter(chapter);
+    }
 
-    sections.forEach((section) => observer.observe(section));
-    return () => observer.disconnect();
+    resolveChapter();
+    window.addEventListener("scroll", resolveChapter, { passive: true });
+    window.addEventListener("resize", resolveChapter, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", resolveChapter);
+      window.removeEventListener("resize", resolveChapter);
+    };
   }, []);
 
   return activeChapter;

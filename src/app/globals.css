@@ -209,10 +209,10 @@ body {
 }
 
 .scene-shell[data-scene="taste"] {
-  --scene-bg: var(--scene-taste-bg);
-  --scene-ink: var(--scene-taste-ink);
+  --scene-bg: var(--paper);
+  --scene-ink: var(--ink);
   --scene-accent: var(--retro-fuchsia);
-  --scene-surface: var(--scene-taste-surface);
+  --scene-surface: var(--hero-surface);
 }
 
 .scene-shell[data-scene="manifesto"] {
@@ -402,6 +402,7 @@ body {
 .hero-garnish--br {
   bottom: 18%;
   right: calc(var(--section-pad-x) + 28px);
+  display: none;
 }
 
 .hero-garnish-box {
@@ -457,6 +458,12 @@ body {
   }
 
   .hero-garnish--tl {
+    display: block;
+  }
+}
+
+@media (min-width: 768px) {
+  .hero-garnish--br {
     display: block;
   }
 }
@@ -610,19 +617,25 @@ html.desi-cursor-active button {
   z-index: 9999;
   width: 36px;
   height: 36px;
-  border: 2px solid var(--hero-accent);
-  border-radius: 50%;
   pointer-events: none;
-  display: grid;
-  place-items: center;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
-  box-shadow: inset 0 0 0 0 var(--hero-accent);
+  will-change: transform;
 }
 
-.desi-cursor--hot {
+.desi-cursor__ring {
+  width: 100%;
+  height: 100%;
+  border: 2px solid var(--hero-accent);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: inset 0 0 0 0 var(--hero-accent);
+  transform-origin: center center;
+}
+
+.desi-cursor__ring--hot {
   border-color: var(--hero-ink);
   box-shadow: inset 0 0 0 14px color-mix(in srgb, var(--hero-accent) 35%, transparent);
-  transform: scale(1.15);
 }
 
 .desi-cursor__orbit {
@@ -650,7 +663,115 @@ html.desi-cursor-active button {
   }
 }
 
-/* ── Product showcase ── */
+/* ── Product editorial (Jeeru-first) ── */
+.product-editorial__grid {
+  display: grid;
+  gap: 2.5rem;
+  align-items: center;
+}
+
+@media (min-width: 900px) {
+  .product-editorial__grid {
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 0.85fr);
+    gap: 3.5rem;
+  }
+}
+
+.product-editorial__visual {
+  justify-self: center;
+  width: min(100%, 420px);
+}
+
+.product-editorial__frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.75rem;
+  border: 3px solid var(--scene-surface);
+  box-shadow:
+    8px 8px 0 0 var(--hero-accent),
+    0 28px 56px color-mix(in srgb, var(--scene-bg) 55%, transparent);
+  background: color-mix(in srgb, var(--scene-surface) 12%, var(--scene-bg));
+}
+
+.product-editorial__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  filter: saturate(1.06) contrast(1.03);
+}
+
+/* ── Taste grid (Jeeru hero card) ── */
+.taste-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+@media (min-width: 768px) {
+  .taste-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+  }
+}
+
+.taste-card {
+  position: relative;
+  display: flex;
+  min-height: 148px;
+  flex-direction: column;
+  justify-content: space-between;
+  border-radius: 1.25rem;
+  background: var(--taste-bg);
+  color: var(--taste-ink);
+  padding: 1rem 1.1rem 1.15rem;
+  border: 2px solid color-mix(in srgb, var(--taste-ink) 22%, transparent);
+  box-shadow: 4px 4px 0 0 color-mix(in srgb, var(--taste-ink) 35%, transparent);
+  transition: transform 0.2s ease;
+}
+
+.taste-card--hero {
+  grid-column: span 2;
+  min-height: 168px;
+}
+
+@media (min-width: 768px) {
+  .taste-card {
+    min-height: 200px;
+  }
+
+  .taste-card--hero {
+    grid-column: span 2;
+    min-height: 220px;
+  }
+}
+
+.taste-card:hover {
+  transform: translateY(-3px);
+}
+
+.taste-card__tag {
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.88;
+}
+
+.taste-card__name {
+  font-size: clamp(2rem, 7vw, 3rem);
+  line-height: 0.88;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.taste-card__badge {
+  margin-top: 0.5rem;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  opacity: 0.9;
+}
+
+/* ── Product showcase (legacy thumbs) ── */
 .product-thumb__frame {
   position: relative;
   overflow: hidden;

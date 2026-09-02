@@ -47,15 +47,28 @@ export function SiteHeader({
       }`}
     >
       <div className="mx-auto flex h-16 max-w-[1280px] items-center justify-between gap-4 px-[var(--section-pad-x)] md:px-[var(--section-pad-x-desktop)]">
-        <Link href="/" className={`group flex min-w-0 items-baseline gap-1.5 no-underline ${inkClass}`}>
-          <span className="font-display text-2xl font-bold leading-none">{copy.header.logo}</span>
-          <span className={`font-label hidden text-[10px] sm:inline ${mutedClass}`}>
-            {copy.header.logoSub}
+        <Link href="/" className={`group flex min-w-0 items-center gap-2 no-underline ${inkClass}`}>
+          <span
+            className={`font-condensed text-[2rem] leading-none tracking-wide ${
+              onDarkHero ? "text-hero-surface" : ""
+            }`}
+          >
+            {copy.header.logo}
+          </span>
+          <span
+            className={`font-receipt hidden text-[9px] tracking-[0.22em] sm:inline ${
+              onDarkHero ? "text-hero-ink/80" : mutedClass
+            }`}
+          >
+            {copy.header.logoSub.toUpperCase()}
           </span>
         </Link>
 
-        <p className={`font-label hidden text-[11px] md:block ${chapterClass}`} aria-live="polite">
-          {chapterLabel}
+        <p
+          className={`font-receipt hidden text-[10px] tracking-[0.18em] sm:block ${chapterClass}`}
+          aria-live="polite"
+        >
+          {chapterLabel.toUpperCase()}
         </p>
 
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
@@ -70,7 +83,7 @@ export function SiteHeader({
 
           <Link
             href="#product"
-            className={onDarkHero ? "btn-pop hidden sm:inline-flex" : "btn-primary hidden sm:inline-flex"}
+            className={onDarkHero ? "btn-pop hidden min-[420px]:inline-flex text-sm" : "btn-primary hidden min-[420px]:inline-flex"}
             data-cursor-label="MEET J"
           >
             {t(copy.header.cta, locale)}
