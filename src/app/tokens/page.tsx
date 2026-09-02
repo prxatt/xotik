@@ -50,7 +50,7 @@ export default function TokensPage() {
           {Object.entries(sceneTokens).map(([key, scene]) => (
             <article
               key={scene.id}
-              className="scene-shell texture-grain overflow-hidden rounded-2xl border-2 border-ink/15 text-scene-ink"
+              className="scene-shell texture-grain texture-grain--layered overflow-hidden rounded-2xl border-2 border-ink/15 text-scene-ink"
               data-scene={key}
             >
               <div className="p-5">

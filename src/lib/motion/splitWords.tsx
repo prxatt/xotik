@@ -9,15 +9,25 @@ export type WordSplitProps = {
   text: string;
   wordClassName?: string;
   lineClassName?: string;
+  /** false for Devanagari — avoids clipping matras above the em box */
+  clip?: boolean;
 };
 
-export function WordSplit({ text, wordClassName = "kinetic-word", lineClassName }: WordSplitProps) {
+export function WordSplit({
+  text,
+  wordClassName = "kinetic-word",
+  lineClassName,
+  clip = true,
+}: WordSplitProps) {
   const words = splitWords(text);
 
   return (
     <span className={lineClassName}>
       {words.map((word, index) => (
-        <span key={`${word}-${index}`} className="inline-block overflow-hidden align-top">
+        <span
+          key={`${word}-${index}`}
+          className={clip ? "inline-block overflow-hidden align-top" : "inline-block align-baseline"}
+        >
           <span className={`${wordClassName} inline-block will-change-transform`}>
             {word}
             {index < words.length - 1 ? "\u00a0" : ""}
