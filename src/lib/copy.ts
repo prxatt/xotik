@@ -22,6 +22,7 @@ export const copy = {
     { id: "find", label: { en: "Find", hinglish: "Find" } },
   ],
   hero: {
+    devanagariAccent: "जेब में J",
     headline: {
       en: ["POCKET-SIZED", "PRIDE."],
       hinglish: ["जेब में J.", "FULL scene."],

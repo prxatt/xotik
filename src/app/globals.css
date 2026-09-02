@@ -153,7 +153,7 @@ body {
 .font-devanagari-display {
   font-family: var(--font-noto-devanagari), sans-serif;
   font-weight: 700;
-  line-height: 0.95;
+  line-height: 1.12;
 }
 
 .font-receipt {
@@ -166,7 +166,6 @@ body {
 
 /* Scene shell — apply to section roots in Phase 1.7 */
 .scene-shell {
-  position: relative;
   background-color: var(--scene-bg, var(--paper));
 }
 
@@ -214,11 +213,15 @@ body {
 
 /* Surface textures */
 .texture-grain {
-  position: relative;
   isolation: isolate;
 }
 
-.texture-grain::after {
+.texture-grain--layered {
+  position: relative;
+}
+
+.texture-grain::after,
+.hero-billboard__grain::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -226,6 +229,38 @@ body {
   opacity: 0.14;
   mix-blend-mode: multiply;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+}
+
+/* Hero billboard — jaguar cinematic opener (matches /tokens) */
+.hero-pin {
+  position: sticky;
+  top: 0;
+  isolation: isolate;
+}
+
+.hero-billboard__bg {
+  position: absolute;
+  inset: 0;
+  background-color: var(--cine-jaguar);
+}
+
+.hero-billboard__glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 90% 55% at 50% 110%,
+    color-mix(in srgb, var(--cine-red) 40%, transparent),
+    transparent 68%
+  );
+  opacity: 0.85;
+}
+
+.hero-billboard__grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.12;
+  mix-blend-mode: soft-light;
 }
 
 .texture-halftone {
