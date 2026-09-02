@@ -209,31 +209,24 @@ body {
 }
 
 .scene-shell[data-scene="taste"] {
-  --scene-bg: var(--hero-bg);
-  --scene-ink: var(--hero-ink);
-  --scene-accent: var(--hero-accent);
-  --scene-surface: var(--hero-surface);
+  --scene-bg: var(--scene-taste-bg);
+  --scene-ink: var(--scene-taste-ink);
+  --scene-accent: var(--j-coral);
+  --scene-surface: var(--scene-taste-surface);
 }
 
 .scene-shell[data-scene="cta"] {
-  --scene-bg: var(--hero-bg);
-  --scene-ink: var(--hero-ink);
-  --scene-accent: var(--hero-accent);
-  --scene-surface: var(--hero-surface);
+  --scene-bg: var(--paper);
+  --scene-ink: var(--ink);
+  --scene-accent: var(--j-coral);
+  --scene-surface: var(--j-yellow);
 }
 
 .scene-shell[data-scene="manifesto"] {
   --scene-bg: var(--scene-manifesto-bg);
-  --scene-ink: var(--scene-manifesto-ink);
-  --scene-accent: var(--scene-manifesto-accent);
+  --scene-ink: var(--hero-ink);
+  --scene-accent: var(--hero-accent);
   --scene-surface: var(--scene-manifesto-gold);
-}
-
-.scene-shell[data-scene="manifesto"] {
-  --scene-bg: var(--scene-manifesto-bg);
-  --scene-ink: var(--hero-ink);
-  --scene-accent: var(--hero-accent);
-  --scene-surface: var(--hero-surface);
 }
 
 /* ── Desi-pop shell (shared billboard chrome) ── */
@@ -254,8 +247,14 @@ body {
   --shell-accent: var(--hero-accent);
 }
 
-.desi-pop-shell[data-scene="product"],
-.desi-pop-shell[data-scene="cta"] {
+.desi-pop-shell[data-scene="factory"]:not(.desi-pop-shell--overlay) {
+  --shell-bg: var(--scene-factory-bg);
+  --shell-ink: var(--scene-factory-surface);
+  --shell-accent: var(--scene-factory-accent);
+  --shell-surface: var(--scene-factory-ink);
+}
+
+.desi-pop-shell[data-scene="product"] {
   --shell-bg: var(--hero-bg);
   --shell-ink: var(--hero-ink);
   --shell-accent: var(--hero-accent);
@@ -263,15 +262,31 @@ body {
 }
 
 .desi-pop-shell[data-scene="taste"] {
-  --shell-bg: var(--hero-bg);
-  --shell-ink: var(--hero-ink);
-  --shell-accent: var(--hero-accent);
+  --shell-bg: var(--scene-taste-bg);
+  --shell-ink: var(--scene-taste-surface);
+  --shell-accent: var(--j-coral);
+  --shell-surface: var(--scene-taste-ink);
+}
+
+.desi-pop-shell[data-scene="cta"] {
+  --shell-bg: var(--paper);
+  --shell-ink: var(--ink);
+  --shell-accent: var(--j-coral);
+  --shell-surface: var(--j-yellow);
 }
 
 .desi-pop-shell[data-scene="manifesto"] {
   --shell-bg: var(--scene-manifesto-bg);
   --shell-ink: var(--hero-ink);
   --shell-accent: var(--hero-accent);
+}
+
+.desi-pop-shell--light .desi-pop-shell__glow {
+  opacity: 0.25;
+}
+
+.desi-pop-shell--light .desi-pop-shell__halftone {
+  opacity: 0.06;
 }
 
 .desi-pop-shell--overlay .desi-pop-shell__bg,
@@ -483,12 +498,24 @@ body {
   backdrop-filter: blur(8px);
 }
 
-.site-header--product,
-.site-header--taste,
-.site-header--cta {
+.site-header--product {
   color: var(--hero-ink);
   background: color-mix(in srgb, var(--hero-bg) 88%, transparent);
   border-bottom-color: var(--hero-accent);
+  backdrop-filter: blur(10px);
+}
+
+.site-header--taste {
+  color: var(--scene-taste-surface);
+  background: color-mix(in srgb, var(--scene-taste-bg) 90%, transparent);
+  border-bottom-color: var(--j-coral);
+  backdrop-filter: blur(10px);
+}
+
+.site-header--cta {
+  color: var(--ink);
+  background: color-mix(in srgb, var(--paper) 92%, transparent);
+  border-bottom-color: var(--j-coral);
   backdrop-filter: blur(10px);
 }
 
@@ -499,12 +526,17 @@ body {
   backdrop-filter: blur(10px);
 }
 
-.site-header--product .btn-pop,
 .site-header--taste .btn-pop,
-.site-header--cta .btn-pop,
-.site-header--manifesto .btn-pop {
-  padding: 10px 20px;
-  font-size: 0.95rem;
+.site-header--cta .btn-pop {
+  padding: 9px 18px;
+  font-size: 0.9rem;
+}
+
+.site-header--cta .btn-pop {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--j-coral);
+  box-shadow: 3px 3px 0 0 var(--j-coral);
 }
 
 .hero-handoff {
@@ -613,30 +645,91 @@ body {
   position: absolute;
   left: -25%;
   width: 150%;
-  z-index: 2;
+  z-index: 1;
   overflow: hidden;
   background: var(--hero-accent);
   color: var(--hero-bg);
   font-family: var(--font-bebas), Impact, sans-serif;
-  font-size: clamp(0.7rem, 2.2vw, 1rem);
-  letter-spacing: 0.28em;
+  font-size: clamp(0.55rem, 1.8vw, 0.9rem);
+  letter-spacing: 0.22em;
   line-height: 1;
-  padding: 0.4rem 0;
+  padding: 0.3rem 0;
   white-space: nowrap;
   pointer-events: none;
-  opacity: 0.95;
+  opacity: 0.82;
 }
 
 .hero-billboard__ribbon--a {
-  top: 14%;
-  transform: rotate(-11deg);
+  top: 10%;
+  transform: rotate(-9deg);
 }
 
 .hero-billboard__ribbon--b {
-  bottom: 22%;
-  transform: rotate(7deg);
+  bottom: 14%;
+  transform: rotate(5deg);
   background: var(--hero-ink);
   color: var(--hero-surface);
+}
+
+@media (max-width: 767px) {
+  .hero-billboard__ribbon--a {
+    top: 18%;
+    opacity: 0.55;
+    font-size: 0.5rem;
+  }
+
+  .hero-billboard__ribbon--b {
+    bottom: 10%;
+    opacity: 0.65;
+  }
+}
+
+.hero-copy-layout {
+  display: grid;
+  gap: 1.25rem;
+}
+
+@media (min-width: 900px) {
+  .hero-copy-layout {
+    grid-template-columns: minmax(0, 1.15fr) minmax(200px, 0.55fr);
+    align-items: end;
+    gap: 2rem 3rem;
+  }
+
+  .hero-copy-layout__sub,
+  .hero-copy-layout__cta {
+    grid-column: 2;
+  }
+}
+
+.hero-copy-layout__cta {
+  margin-top: 0.5rem;
+}
+
+.btn-pop--hero {
+  padding: 10px 22px;
+  font-size: 0.95rem;
+  box-shadow: 3px 3px 0 0 var(--hero-accent);
+}
+
+.btn-pop--hero:hover {
+  box-shadow: 1px 1px 0 0 var(--hero-accent);
+}
+
+.desi-pop-shell__ribbon {
+  z-index: 1;
+  font-size: clamp(0.5rem, 1.6vw, 0.85rem);
+  opacity: 0.75;
+}
+
+.desi-pop-shell__ribbon--a {
+  top: 9%;
+  transform: rotate(-8deg);
+}
+
+.desi-pop-shell__ribbon--b {
+  bottom: 11%;
+  transform: rotate(5deg);
 }
 
 .hero-billboard__ribbon span {
@@ -1158,26 +1251,26 @@ html.desi-cursor-active button {
   display: inline-flex;
   align-items: center;
   border-radius: var(--radius-pill);
-  border: 2px solid var(--scene-surface);
-  padding: 12px 22px;
+  border: 2px solid var(--scene-ink);
+  padding: 10px 20px;
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   text-decoration: none;
-  color: var(--scene-surface);
+  color: var(--scene-ink);
   background: transparent;
   transition: background 0.2s ease, color 0.2s ease;
 }
 
 .cta-secondary:hover {
-  background: var(--scene-surface);
+  background: var(--scene-ink);
   color: var(--scene-bg);
 }
 
 .cta-store-card {
   border-radius: 1rem;
-  border: 2px dashed var(--scene-surface);
-  background: color-mix(in srgb, var(--scene-bg) 80%, black);
+  border: 2px dashed var(--scene-accent);
+  background: color-mix(in srgb, var(--scene-bg) 96%, white);
 }
 
 /* ── Manifesto motion path (Maker's Manifesto pattern) ── */

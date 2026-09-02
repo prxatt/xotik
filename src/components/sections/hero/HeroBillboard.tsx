@@ -84,7 +84,7 @@ export function HeroBillboard({
         </div>
       )}
 
-      <div className="relative z-10 flex h-full flex-col justify-center px-[var(--section-pad-x)] pb-10 pt-20 md:px-[var(--section-pad-x-desktop)] md:pb-14 md:pt-24">
+      <div className="relative z-20 flex h-full flex-col justify-center px-[var(--section-pad-x)] pb-10 pt-24 md:px-[var(--section-pad-x-desktop)] md:pb-14 md:pt-28">
         <div className="mx-auto w-full max-w-[1280px]">{children}</div>
       </div>
     </div>
@@ -141,7 +141,7 @@ export function HeroBillboardCopy({
 
       <h1
         ref={headlineRef}
-        className="hero-kinetic-headline font-condensed text-[clamp(4rem,22vw,12.5rem)] leading-[0.82] tracking-[0.03em] text-hero-ink"
+        className="hero-kinetic-headline font-condensed text-[clamp(3.25rem,18vw,11rem)] leading-[0.84] tracking-[0.03em] text-hero-ink"
       >
         {headlines.map((line, index) => (
           <span
@@ -164,8 +164,8 @@ export function HeroBillboardCopy({
         ref={typeLayerRef}
         className={
           kineticLines
-            ? "hero-kinetic-type hero-kinetic-stack relative z-10 will-change-transform"
-            : ""
+            ? "hero-kinetic-type hero-kinetic-stack hero-copy-layout relative z-20 will-change-transform"
+            : "hero-copy-layout"
         }
       >
         {kineticLines && (
@@ -185,12 +185,12 @@ export function HeroBillboardCopy({
 
       <p
         ref={subRef}
-        className="font-body mt-8 max-w-md text-base text-hero-ink/90 md:mt-10 md:text-lg"
+        className="font-body hero-copy-layout__sub max-w-md text-base text-hero-ink/90 md:text-lg"
       >
         {sub}
       </p>
 
-      <div ref={ctaRef} className="mt-8">
+      <div ref={ctaRef} className="hero-copy-layout__cta">
         {cta}
       </div>
     </>
