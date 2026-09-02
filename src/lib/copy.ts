@@ -124,6 +124,88 @@ export const copy = {
       en: ["DESI BORN.", "GO EVERYWHERE."],
       hinglish: ["DESI DIL.", "GLOBAL SCENE."],
     },
+    intro: {
+      en: "THE J MANIFESTO",
+      hinglish: "J KA MANIFESTO",
+    },
+    stops: [
+      {
+        id: "pocket",
+        label: { en: "J MANIFESTO · 01 / 05", hinglish: "J MANIFESTO · 01 / 05" },
+        title: { en: "POCKET-SIZED PRIDE", hinglish: "JEB MEIN J" },
+        body: {
+          en: "Small bottle. Big scene. J fits the gully, the ride home, and every pocket that needs fizz.",
+          hinglish: "Chhoti bottle. Bada scene. Gully se ghar tak — jeb mein poora fizz.",
+        },
+      },
+      {
+        id: "desi",
+        label: { en: "J MANIFESTO · 02 / 05", hinglish: "J MANIFESTO · 02 / 05" },
+        title: { en: "DESI BORN", hinglish: "DESI DIL" },
+        body: {
+          en: "Masala memory. Apple twist. Made for streets that never stay quiet.",
+          hinglish: "Masala yaad. Apple ka twist. Un gulliyon ke liye jo kabhi chup nahi hoti.",
+        },
+      },
+      {
+        id: "colours",
+        label: { en: "J MANIFESTO · 03 / 05", hinglish: "J MANIFESTO · 03 / 05" },
+        title: { en: "SIX COLOURS", hinglish: "CHHE RANG" },
+        body: {
+          en: "Coral. Orange. Yellow. Green. Blue. Violet. One brand, full spectrum attitude.",
+          hinglish: "Coral se violet tak — ek brand, poora rang, poora swag.",
+        },
+      },
+      {
+        id: "fizz",
+        label: { en: "J MANIFESTO · 04 / 05", hinglish: "J MANIFESTO · 04 / 05" },
+        title: { en: "FULL FIZZ", hinglish: "POORA FIZZ" },
+        body: {
+          en: "Not shy. Not subtle. Crack the seal — the scene starts now.",
+          hinglish: "Sharmao mat. Daba kholo — scene abhi shuru.",
+        },
+      },
+      {
+        id: "everywhere",
+        label: { en: "J MANIFESTO · 05 / 05", hinglish: "J MANIFESTO · 05 / 05" },
+        title: { en: "GO EVERYWHERE", hinglish: "GLOBAL SCENE" },
+        body: {
+          en: "From Xotik Frujus to your hand. Desi pop that travels.",
+          hinglish: "Xotik Frujus se tumhare haath tak. Desi pop jo door jaaye.",
+        },
+      },
+    ],
+    oathBridge: {
+      label: { en: "✦ PRINCIPLES DONE ✦", hinglish: "✦ RULES KHATAM ✦" },
+      headline: { en: "NOW TAKE", hinglish: "AB LE LO" },
+      headlineAccent: { en: "THE OATH", hinglish: "J KI KASAM" },
+      sub: {
+        en: "Hover each line — this is what J stands for.",
+        hinglish: "Har line pe hover karo — J ka matlab yahi hai.",
+      },
+    },
+    oath: [
+      {
+        main: { en: "DRINK IT", hinglish: "PIYO" },
+        reveal: { en: "BEFORE IT'S COOL", hinglish: "COOL BANNE SE PEHLE" },
+      },
+      {
+        main: { en: "SHAKE IT", hinglish: "HILAO" },
+        reveal: { en: "EVEN IF IT FIZZES OVER", hinglish: "CHAHE BAHAR AA JAYE" },
+      },
+      {
+        main: { en: "SHARE IT", hinglish: "BAANTO" },
+        reveal: { en: "ESPECIALLY WITH RIVALS", hinglish: "RIVALS KE SAATH BHI" },
+      },
+      {
+        main: { en: "LOUD IT", hinglish: "CHILLAO" },
+        reveal: { en: "THEN DRINK IT AGAIN", hinglish: "PHIR SE PIYO" },
+      },
+      {
+        main: { en: "JUST J", hinglish: "BAS J" },
+        reveal: { en: "POCKET-SIZED PRIDE", hinglish: "JEB MEIN FULL SCENE" },
+      },
+    ],
   },
   cta: {
     primary: { en: "Find J near you", hinglish: "J kahan milega?" },
