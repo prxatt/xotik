@@ -180,6 +180,13 @@ body {
   background-color: var(--scene-bg, var(--paper));
 }
 
+.scene-shell[data-scene="hero"] {
+  --scene-bg: var(--hero-bg);
+  --scene-ink: var(--hero-ink);
+  --scene-accent: var(--hero-accent);
+  --scene-surface: var(--hero-surface);
+}
+
 .scene-shell[data-scene="street"] {
   --scene-bg: var(--scene-street-bg);
   --scene-ink: var(--scene-street-ink);
@@ -260,6 +267,10 @@ body {
   transform-origin: 0% 50%;
   filter: blur(1px);
   color: var(--hero-accent);
+}
+
+.hero-kinetic-stack {
+  position: relative;
 }
 
 .hero-kinetic-headline,

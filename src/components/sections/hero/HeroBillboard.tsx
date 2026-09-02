@@ -150,27 +150,27 @@ export function HeroBillboardCopy({
 
   return (
     <>
-      {kineticLines && (
-        <div
-          ref={ghostRef}
-          aria-hidden
-          className="hero-kinetic-ghost pointer-events-none absolute left-[var(--section-pad-x)] top-1/2 z-0 -translate-y-1/2 will-change-transform md:left-[var(--section-pad-x-desktop)]"
-        >
-          <h2 className="hero-kinetic-headline font-condensed text-[clamp(4rem,22vw,12.5rem)] leading-[0.82] tracking-[0.03em] opacity-30">
-            {headlines.map((line) => (
-              <span key={`ghost-${line}`} className="hero-kinetic-line block">
-                {line}
-              </span>
-            ))}
-          </h2>
-        </div>
-      )}
-
       <div
         ref={typeLayerRef}
-        className={kineticLines ? "hero-kinetic-type relative z-10 will-change-transform" : ""}
+        className={
+          kineticLines
+            ? "hero-kinetic-type hero-kinetic-stack relative z-10 will-change-transform"
+            : ""
+        }
       >
-        {typeContent}
+        {kineticLines && (
+          <div ref={ghostRef} aria-hidden className="hero-kinetic-ghost pointer-events-none absolute inset-0 z-0">
+            <h2 className="hero-kinetic-headline font-condensed text-[clamp(4rem,22vw,12.5rem)] leading-[0.82] tracking-[0.03em] opacity-30">
+              {headlines.map((line) => (
+                <span key={`ghost-${line}`} className="hero-kinetic-line block">
+                  {line}
+                </span>
+              ))}
+            </h2>
+          </div>
+        )}
+
+        <div className="relative z-10">{typeContent}</div>
       </div>
 
       <p

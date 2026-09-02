@@ -25,7 +25,7 @@ const SCENE = {
       { x: 48, y: -130, rotate: 2 },
     ],
     accentY: -100,
-    ghostY: -40,
+    ghostScale: 1.14,
     garnishY: -50,
     stampRotate: -18,
   },
@@ -39,7 +39,7 @@ const SCENE = {
       { x: 96, y: -190, rotate: 4.5 },
     ],
     accentY: -150,
-    ghostY: -70,
+    ghostScale: 1.18,
     garnishY: -80,
     stampRotate: -28,
   },
@@ -117,8 +117,8 @@ export function HeroKineticScene({ locale, tier }: HeroKineticSceneProps) {
       if (ghost) {
         tl.fromTo(
           ghost,
-          { y: 0, opacity: 0.28, scale: 1.02 },
-          { y: scene.ghostY, opacity: 0, scale: 1.14, ease: "none", duration: 1 },
+          { opacity: 0.28, scale: 1.02 },
+          { opacity: 0, scale: scene.ghostScale, ease: "none", duration: 1 },
           0,
         );
       }
