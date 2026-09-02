@@ -12,6 +12,8 @@ type HeroBillboardProps = {
   garnishTopRef?: React.RefObject<HTMLParagraphElement | null>;
   garnishBoxRef?: React.RefObject<HTMLParagraphElement | null>;
   stampRef?: React.RefObject<HTMLDivElement | null>;
+  handoffRef?: React.RefObject<HTMLDivElement | null>;
+  handoffLabel?: string;
   /** Allow type to scale/translate outside frame without clipping */
   clip?: boolean;
 };
@@ -30,6 +32,8 @@ export function HeroBillboard({
   garnishTopRef,
   garnishBoxRef,
   stampRef,
+  handoffRef,
+  handoffLabel,
   clip = true,
 }: HeroBillboardProps) {
   const ribbonChunk = ribbonText.repeat(RIBBON_REPEAT);
@@ -71,6 +75,12 @@ export function HeroBillboard({
       {stampText && (
         <div ref={stampRef} className="hero-stamp" aria-hidden>
           {stampText}
+        </div>
+      )}
+
+      {handoffLabel && (
+        <div ref={handoffRef} className="hero-handoff font-condensed" aria-hidden>
+          {handoffLabel}
         </div>
       )}
 

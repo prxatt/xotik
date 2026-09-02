@@ -16,32 +16,32 @@ type HeroKineticSceneProps = {
 
 const SCENE = {
   1: {
-    scrollVh: 110,
-    scaleFrom: 1.1,
-    scaleTo: 0.72,
-    layerY: -160,
+    scrollVh: 105,
+    scaleFrom: 1.04,
+    scaleTo: 0.9,
+    layerY: -72,
     lineShift: [
-      { x: -32, y: -70, rotate: -1.5 },
-      { x: 48, y: -130, rotate: 2 },
+      { x: -18, y: -36, rotate: -1 },
+      { x: 24, y: -58, rotate: 1.5 },
     ],
-    accentY: -100,
-    ghostScale: 1.14,
-    garnishY: -50,
-    stampRotate: -18,
+    accentY: -48,
+    ghostScale: 1.08,
+    garnishY: -28,
+    stampRotate: -14,
   },
   2: {
-    scrollVh: 145,
-    scaleFrom: 1.22,
-    scaleTo: 0.58,
-    layerY: -240,
+    scrollVh: 118,
+    scaleFrom: 1.08,
+    scaleTo: 0.86,
+    layerY: -96,
     lineShift: [
-      { x: -72, y: -110, rotate: -3.5 },
-      { x: 96, y: -190, rotate: 4.5 },
+      { x: -36, y: -52, rotate: -2 },
+      { x: 48, y: -78, rotate: 2.5 },
     ],
-    accentY: -150,
-    ghostScale: 1.18,
-    garnishY: -80,
-    stampRotate: -28,
+    accentY: -64,
+    ghostScale: 1.1,
+    garnishY: -40,
+    stampRotate: -18,
   },
 } as const;
 
@@ -56,6 +56,7 @@ export function HeroKineticScene({ locale, tier }: HeroKineticSceneProps) {
   const accentRef = useRef<HTMLParagraphElement>(null);
   const subRef = useRef<HTMLParagraphElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
+  const handoffRef = useRef<HTMLDivElement>(null);
   const garnishTopRef = useRef<HTMLParagraphElement>(null);
   const garnishBoxRef = useRef<HTMLParagraphElement>(null);
   const stampRef = useRef<HTMLDivElement>(null);
@@ -70,6 +71,7 @@ export function HeroKineticScene({ locale, tier }: HeroKineticSceneProps) {
     const accent = accentRef.current;
     const sub = subRef.current;
     const cta = ctaRef.current;
+    const handoff = handoffRef.current;
     const garnishTop = garnishTopRef.current;
     const garnishBox = garnishBoxRef.current;
     const stamp = stampRef.current;
@@ -80,9 +82,11 @@ export function HeroKineticScene({ locale, tier }: HeroKineticSceneProps) {
     if (reducedMotion) return;
 
     const lines = headline.querySelectorAll<HTMLElement>(".hero-kinetic-line");
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    const scrollVh = isMobile ? Math.min(scene.scrollVh, 100) : scene.scrollVh;
 
     const ctx = gsap.context(() => {
-      const endDistance = () => `+=${window.innerHeight * (scene.scrollVh / 100)}`;
+      const endDistance = () => `+=${window.innerHeight * (scrollVh / 100)}`;
 
       const scrollConfig = {
         trigger: root,
@@ -98,10 +102,11 @@ export function HeroKineticScene({ locale, tier }: HeroKineticSceneProps) {
 
       const tl = gsap.timeline({ scrollTrigger: scrollConfig });
 
+      // Phase A (0–0.42): gentle kinetic — headline stays readable
       tl.fromTo(
         typeLayer,
-        { scale: scene.scaleFrom, y: 0, transformOrigin: "0% 50%" },
-        { scale: scene.scaleTo, y: scene.layerY, ease: "none", duration: 1 },
+        { scale: scene.scaleFrom, y: 0, opacity: 1, transformOrigin: "0% 50%" },
+        { scale: scene.scaleTo, y: scene.layerY * 0.55, ease: "none", duration: 0.42 },
         0,
       );
 
@@ -110,7 +115,13 @@ export function HeroKineticScene({ locale, tier }: HeroKineticSceneProps) {
         tl.fromTo(
           line,
           { x: 0, y: 0, rotation: 0 },
-          { x: shift.x, y: shift.y, rotation: shift.rotate, ease: "none", duration: 1 },
+          {
+            x: shift.x * 0.6,
+            y: shift.y * 0.6,
+            rotation: shift.rotate * 0.6,
+            ease: "none",
+            duration: 0.42,
+          },
           0,
         );
       });
@@ -118,8 +129,8 @@ export function HeroKineticScene({ locale, tier }: HeroKineticSceneProps) {
       if (ghost) {
         tl.fromTo(
           ghost,
-          { opacity: 0.28, scale: 1.02 },
-          { opacity: 0, scale: scene.ghostScale, ease: "none", duration: 1 },
+          { opacity: 0.22, scale: 1.01 },
+          { opacity: 0, scale: scene.ghostScale, ease: "none", duration: 0.38 },
           0,
         );
       }
@@ -128,7 +139,7 @@ export function HeroKineticScene({ locale, tier }: HeroKineticSceneProps) {
         tl.fromTo(
           accent,
           { y: 0, opacity: 1 },
-          { y: scene.accentY, opacity: 0.15, ease: "none", duration: 0.85 },
+          { y: scene.accentY * 0.5, opacity: 0.55, ease: "none", duration: 0.35 },
           0,
         );
       }
@@ -138,8 +149,8 @@ export function HeroKineticScene({ locale, tier }: HeroKineticSceneProps) {
         tl.fromTo(
           el,
           { y: 0, opacity: 1 },
-          { y: scene.garnishY, opacity: 0, ease: "none", duration: 0.6 },
-          0.02,
+          { y: scene.garnishY, opacity: 0.35, ease: "none", duration: 0.32 },
+          0.04,
         );
       });
 
@@ -148,30 +159,48 @@ export function HeroKineticScene({ locale, tier }: HeroKineticSceneProps) {
           stamp,
           { y: 0, rotation: -8, opacity: 1, scale: 1 },
           {
-            y: -60,
+            y: -32,
             rotation: scene.stampRotate,
-            opacity: 0,
-            scale: 1.15,
+            opacity: 0.4,
+            scale: 1.08,
             ease: "none",
-            duration: 0.75,
+            duration: 0.34,
           },
-          0.04,
+          0.06,
         );
       }
 
+      // Phase B (0.42–0.68): hold — sub/cta stay, handoff appears
+      if (handoff) {
+        gsap.set(handoff, { opacity: 0, y: 24 });
+        tl.to(handoff, { opacity: 1, y: 0, ease: "none", duration: 0.18 }, 0.44);
+      }
+
+      // Phase C (0.68–0.88): exit — only now fade supporting copy
       tl.fromTo(
         sub,
         { opacity: 1, y: 0 },
-        { opacity: 0, y: -40, ease: "none", duration: 0.45 },
-        0.05,
+        { opacity: 0, y: -24, ease: "none", duration: 0.14 },
+        0.68,
       );
 
       tl.fromTo(
         cta,
         { opacity: 1, y: 0 },
-        { opacity: 0, y: -28, ease: "none", duration: 0.4 },
-        0.08,
+        { opacity: 0, y: -18, ease: "none", duration: 0.12 },
+        0.72,
       );
+
+      tl.fromTo(
+        typeLayer,
+        { opacity: 1, y: scene.layerY * 0.55 },
+        { opacity: 0, y: scene.layerY, ease: "none", duration: 0.18 },
+        0.78,
+      );
+
+      if (handoff) {
+        tl.to(handoff, { opacity: 0, y: -16, ease: "none", duration: 0.1 }, 0.88);
+      }
 
       ScrollTrigger.refresh();
     }, root);
@@ -197,6 +226,8 @@ export function HeroKineticScene({ locale, tier }: HeroKineticSceneProps) {
         garnishTopRef={garnishTopRef}
         garnishBoxRef={garnishBoxRef}
         stampRef={stampRef}
+        handoffRef={handoffRef}
+        handoffLabel={t(copy.hero.handoff, locale)}
       >
         <HeroBillboardCopy
           locale={locale}

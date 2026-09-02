@@ -26,7 +26,7 @@ function CtaPanel({ locale, animated }: { locale: Locale; animated: boolean }) {
       <p className="font-receipt mb-4 text-[11px] tracking-[0.2em] text-scene-accent">
         06 · Find · Xotik Frujus
       </p>
-      <h2 className="section-kinetic-line font-condensed text-[clamp(2.5rem,10vw,5rem)] leading-[0.9] text-scene-ink">
+      <h2 className="section-kinetic-line font-condensed text-[clamp(2.5rem,10vw,5rem)] leading-[0.88] text-scene-surface">
         {t(copy.cta.primary, locale)}
       </h2>
 
@@ -55,10 +55,10 @@ function CtaPanel({ locale, animated }: { locale: Locale; animated: boolean }) {
         <p className="font-receipt mb-2 text-[10px] tracking-[0.16em] text-scene-accent">
           Store locator
         </p>
-        <p className="font-body text-sm text-scene-ink/80">{t(copy.cta.stores, locale)}</p>
+        <p className="font-receipt text-sm tracking-[0.06em] text-scene-surface/85">{t(copy.cta.stores, locale)}</p>
         <a
           href={`mailto:${copy.footer.email}`}
-          className="mt-3 inline-block font-medium text-scene-ink underline-offset-2 hover:underline"
+          className="mt-3 inline-block font-receipt text-xs tracking-[0.12em] text-scene-surface underline-offset-2 hover:underline"
         >
           {copy.footer.email}
         </a>
@@ -77,7 +77,7 @@ export function CtaSection({ locale }: { locale: Locale }) {
       id="find-j"
       scene="cta"
       aria-label="Find J"
-      className="relative border-t border-scene-ink/10"
+      className="relative overflow-hidden"
       tier0={<CtaPanel locale={locale} animated={false} />}
       tier1={<CtaPanel locale={locale} animated />}
       tier2={<CtaPanel locale={locale} animated />}

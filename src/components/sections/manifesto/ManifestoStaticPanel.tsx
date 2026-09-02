@@ -45,7 +45,7 @@ export function ManifestoStaticPanel({ locale }: { locale: Locale }) {
           >
             <span className="manifesto-stop-card__label font-receipt">{t(stop.label, locale)}</span>
             <h3 className="manifesto-stop-card__title font-condensed">{t(stop.title, locale)}</h3>
-            <p className="manifesto-stop-card__body font-body">{t(stop.body, locale)}</p>
+            <p className="manifesto-stop-card__body font-receipt">{t(stop.body, locale)}</p>
           </article>
         ))}
       </div>

@@ -8,6 +8,7 @@ import {
   FactoryCopy,
   FactoryVisual,
 } from "@/components/sections/factory/FactoryShared";
+import { DesiPopShell } from "@/components/layout/DesiPopShell";
 import {
   StreetCopy,
   StreetMonsoonImage,
@@ -205,6 +206,8 @@ export function StreetFactoryScene({ locale, tier }: StreetFactorySceneProps) {
       style={{ height: `${config.totalVh}vh`, minHeight: `${config.totalVh}vh` }}
     >
       <div className="sticky top-0 h-[100dvh] min-h-[100dvh] overflow-hidden">
+        <DesiPopShell scene="street" chromeOnly className="desi-pop-shell--overlay pointer-events-none absolute inset-0 z-30" />
+
         <div ref={factoryGroupRef} className="absolute inset-0 z-0 opacity-0" aria-hidden>
           <FactoryVisual variant={config.factoryVariant} />
         </div>
@@ -255,8 +258,8 @@ export function StreetFactoryScene({ locale, tier }: StreetFactorySceneProps) {
         </div>
 
         {tier === 2 && (
-          <p className="font-label absolute bottom-4 right-4 z-30 rounded-full bg-white/80 px-3 py-1 text-[9px] text-ink/50">
-            Tier 2 · street → factory
+          <p className="font-receipt absolute bottom-4 right-4 z-30 rounded-full border border-hero-ink/30 bg-[#040011]/70 px-3 py-1 text-[9px] tracking-[0.14em] text-hero-ink">
+            STREET → FACTORY
           </p>
         )}
       </div>

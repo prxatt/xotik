@@ -26,14 +26,14 @@ function IngredientsPanel({ locale, animated }: { locale: Locale; animated: bool
       <p className="font-receipt mb-4 text-[11px] tracking-[0.2em] text-scene-accent">
         04 · {t(copy.ingredients.eyebrow, locale)}
       </p>
-      <h2 className="font-condensed mb-3 text-[clamp(2.25rem,9vw,4.5rem)] leading-[0.9] text-scene-ink">
+      <h2 className="font-condensed mb-3 text-[clamp(2.5rem,10vw,5rem)] leading-[0.88] text-scene-surface">
         {lines.map((line) => (
           <span key={line} className="section-kinetic-line block">
             {line}
           </span>
         ))}
       </h2>
-      <p className="font-body mb-10 max-w-lg text-sm text-scene-ink/80 md:text-base">
+      <p className="font-receipt mb-10 max-w-lg text-sm tracking-[0.06em] text-scene-surface/85 md:text-base">
         {t(copy.ingredients.lead, locale)}
       </p>
 
@@ -68,7 +68,7 @@ export function IngredientsSection({ locale }: { locale: Locale }) {
       id="ingredients"
       scene="taste"
       aria-label="J by Jeeru taste"
-      className="relative border-t border-scene-ink/10"
+      className="relative overflow-hidden text-scene-ink"
       tier0={<IngredientsPanel locale={locale} animated={false} />}
       tier1={<IngredientsPanel locale={locale} animated />}
       tier2={<IngredientsPanel locale={locale} animated />}

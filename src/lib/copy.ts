@@ -41,6 +41,7 @@ export const copy = {
     },
     stamp: { en: "पूरा FIZZ", hinglish: "पूरा FIZZ" },
     cta: { en: "Meet J", hinglish: "Mil J" },
+    handoff: { en: "STREET SCENE ↓", hinglish: "GULLY SCENE ↓" },
     sub: {
       en: "Apple juice. Masala fizz. Very desi. Very J.",
       hinglish: "Apple ka twist. Masala ka kick. Poora fizz. Poora scene.",

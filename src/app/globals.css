@@ -202,16 +202,23 @@ body {
 }
 
 .scene-shell[data-scene="product"] {
-  --scene-bg: var(--scene-product-bg);
-  --scene-ink: var(--scene-product-ink);
-  --scene-accent: var(--j-coral);
-  --scene-surface: var(--scene-product-surface);
+  --scene-bg: var(--hero-bg);
+  --scene-ink: var(--hero-ink);
+  --scene-accent: var(--hero-accent);
+  --scene-surface: var(--hero-surface);
 }
 
 .scene-shell[data-scene="taste"] {
-  --scene-bg: var(--paper);
-  --scene-ink: var(--ink);
-  --scene-accent: var(--retro-fuchsia);
+  --scene-bg: var(--hero-bg);
+  --scene-ink: var(--hero-ink);
+  --scene-accent: var(--hero-accent);
+  --scene-surface: var(--hero-surface);
+}
+
+.scene-shell[data-scene="cta"] {
+  --scene-bg: var(--hero-bg);
+  --scene-ink: var(--hero-ink);
+  --scene-accent: var(--hero-accent);
   --scene-surface: var(--hero-surface);
 }
 
@@ -222,11 +229,300 @@ body {
   --scene-surface: var(--scene-manifesto-gold);
 }
 
-.scene-shell[data-scene="cta"] {
-  --scene-bg: var(--scene-cta-bg);
-  --scene-ink: var(--scene-cta-ink);
-  --scene-accent: var(--j-blue);
-  --scene-surface: var(--paper);
+.scene-shell[data-scene="manifesto"] {
+  --scene-bg: var(--scene-manifesto-bg);
+  --scene-ink: var(--hero-ink);
+  --scene-accent: var(--hero-accent);
+  --scene-surface: var(--hero-surface);
+}
+
+/* ── Desi-pop shell (shared billboard chrome) ── */
+.desi-pop-shell {
+  position: relative;
+  isolation: isolate;
+  --shell-bg: var(--hero-bg);
+  --shell-ink: var(--hero-ink);
+  --shell-accent: var(--hero-accent);
+  --shell-surface: var(--hero-surface);
+  --shell-grid-strength: 10%;
+}
+
+.desi-pop-shell[data-scene="street"],
+.desi-pop-shell[data-scene="factory"] {
+  --shell-bg: transparent;
+  --shell-ink: var(--hero-ink);
+  --shell-accent: var(--hero-accent);
+}
+
+.desi-pop-shell[data-scene="product"],
+.desi-pop-shell[data-scene="cta"] {
+  --shell-bg: var(--hero-bg);
+  --shell-ink: var(--hero-ink);
+  --shell-accent: var(--hero-accent);
+  --shell-surface: var(--hero-surface);
+}
+
+.desi-pop-shell[data-scene="taste"] {
+  --shell-bg: var(--hero-bg);
+  --shell-ink: var(--hero-ink);
+  --shell-accent: var(--hero-accent);
+}
+
+.desi-pop-shell[data-scene="manifesto"] {
+  --shell-bg: var(--scene-manifesto-bg);
+  --shell-ink: var(--hero-ink);
+  --shell-accent: var(--hero-accent);
+}
+
+.desi-pop-shell--overlay .desi-pop-shell__bg,
+.desi-pop-shell--overlay .desi-pop-shell__glow {
+  opacity: 0;
+}
+
+.desi-pop-shell--overlay .desi-pop-shell__halftone {
+  opacity: 0.06;
+}
+
+.desi-pop-shell__content {
+  position: relative;
+  z-index: 10;
+}
+
+.desi-pop-shell__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-color: var(--shell-bg);
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--shell-ink) var(--shell-grid-strength), transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--shell-ink) var(--shell-grid-strength), transparent) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.desi-pop-shell__rail {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--shell-accent);
+  z-index: 6;
+  pointer-events: none;
+}
+
+.desi-pop-shell__rail--left {
+  left: 14px;
+}
+
+.desi-pop-shell__rail--right {
+  right: 14px;
+}
+
+.desi-pop-shell__ribbon {
+  position: absolute;
+  left: -25%;
+  width: 150%;
+  z-index: 2;
+  overflow: hidden;
+  background: var(--shell-accent);
+  color: var(--shell-bg);
+  font-family: var(--font-bebas), Impact, sans-serif;
+  font-size: clamp(0.65rem, 2vw, 0.95rem);
+  letter-spacing: 0.28em;
+  line-height: 1;
+  padding: 0.35rem 0;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0.92;
+}
+
+.desi-pop-shell__ribbon--a {
+  top: 12%;
+  transform: rotate(-10deg);
+}
+
+.desi-pop-shell__ribbon--b {
+  bottom: 16%;
+  transform: rotate(6deg);
+  background: var(--shell-ink);
+  color: var(--shell-surface);
+}
+
+.desi-pop-shell__ribbon span {
+  display: inline-block;
+  padding-left: 0.5rem;
+  animation: hero-ribbon-drift 18s linear infinite;
+}
+
+.desi-pop-shell__halftone {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0.09;
+  background-image: radial-gradient(circle, var(--shell-ink) 0.75px, transparent 0.75px);
+  background-size: 5px 5px;
+  mix-blend-mode: soft-light;
+}
+
+.desi-pop-shell__glow {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: radial-gradient(
+    ellipse 80% 50% at 50% 100%,
+    color-mix(in srgb, var(--shell-accent) 35%, transparent),
+    transparent 70%
+  );
+  opacity: 0.5;
+}
+
+.desi-pop-shell__grain {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0.14;
+  mix-blend-mode: overlay;
+}
+
+.desi-pop-shell__grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.14;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+}
+
+/* ── Scene-aware site header ── */
+.site-header {
+  position: fixed;
+  inset-inline: 0;
+  top: 0;
+  z-index: 50;
+  transition:
+    background-color 280ms ease,
+    border-color 280ms ease,
+    color 280ms ease;
+  border-bottom: 2px solid transparent;
+}
+
+.site-header__inner {
+  margin-inline: auto;
+  display: flex;
+  height: 4rem;
+  max-width: 1280px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-inline: var(--section-pad-x);
+}
+
+@media (min-width: 768px) {
+  .site-header__inner {
+    padding-inline: var(--section-pad-x-desktop);
+  }
+}
+
+.site-header__logo {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.5rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.site-header__logo-mark {
+  font-size: 2rem;
+  line-height: 1;
+  letter-spacing: 0.04em;
+}
+
+.site-header__logo-sub {
+  font-size: 9px;
+  letter-spacing: 0.22em;
+}
+
+.site-header__chapter {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  opacity: 0.9;
+}
+
+.site-header__actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.site-header__chip {
+  border-radius: var(--radius-pill);
+  border: 2px solid currentColor;
+  background: color-mix(in srgb, currentColor 8%, transparent);
+  padding: 0.5rem 0.75rem;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: inherit;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.site-header__chip:hover {
+  background: color-mix(in srgb, currentColor 16%, transparent);
+}
+
+.site-header--hero,
+.site-header--street,
+.site-header--factory {
+  color: var(--hero-ink);
+  background: color-mix(in srgb, var(--hero-bg) 12%, transparent);
+  border-bottom-color: color-mix(in srgb, var(--hero-accent) 45%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.site-header--product,
+.site-header--taste,
+.site-header--cta {
+  color: var(--hero-ink);
+  background: color-mix(in srgb, var(--hero-bg) 88%, transparent);
+  border-bottom-color: var(--hero-accent);
+  backdrop-filter: blur(10px);
+}
+
+.site-header--manifesto {
+  color: var(--hero-ink);
+  background: color-mix(in srgb, var(--scene-manifesto-bg) 92%, transparent);
+  border-bottom-color: var(--hero-accent);
+  backdrop-filter: blur(10px);
+}
+
+.site-header--product .btn-pop,
+.site-header--taste .btn-pop,
+.site-header--cta .btn-pop,
+.site-header--manifesto .btn-pop {
+  padding: 10px 20px;
+  font-size: 0.95rem;
+}
+
+.hero-handoff {
+  position: absolute;
+  z-index: 12;
+  left: 50%;
+  bottom: 18%;
+  transform: translateX(-50%);
+  padding: 0.5rem 1.25rem;
+  border: 2px solid var(--hero-ink);
+  background: color-mix(in srgb, var(--hero-bg) 75%, transparent);
+  color: var(--hero-ink);
+  font-size: clamp(1.25rem, 5vw, 2rem);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  box-shadow: 4px 4px 0 0 var(--hero-accent);
+  pointer-events: none;
+  opacity: 0;
 }
 
 /* Surface textures */
@@ -862,26 +1158,26 @@ html.desi-cursor-active button {
   display: inline-flex;
   align-items: center;
   border-radius: var(--radius-pill);
-  border: 2px solid var(--scene-ink);
+  border: 2px solid var(--scene-surface);
   padding: 12px 22px;
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   text-decoration: none;
-  color: var(--scene-ink);
+  color: var(--scene-surface);
   background: transparent;
   transition: background 0.2s ease, color 0.2s ease;
 }
 
 .cta-secondary:hover {
-  background: var(--scene-ink);
+  background: var(--scene-surface);
   color: var(--scene-bg);
 }
 
 .cta-store-card {
   border-radius: 1rem;
-  border: 2px dashed var(--scene-accent);
-  background: color-mix(in srgb, var(--scene-bg) 92%, white);
+  border: 2px dashed var(--scene-surface);
+  background: color-mix(in srgb, var(--scene-bg) 80%, black);
 }
 
 /* ── Manifesto motion path (Maker's Manifesto pattern) ── */
@@ -956,19 +1252,31 @@ html.desi-cursor-active button {
   position: relative;
   max-width: min(560px, 92vw);
   width: 100%;
-  border: 3px solid var(--scene-manifesto-ink);
-  box-shadow: 7px 7px 0 color-mix(in srgb, var(--scene-manifesto-accent) 80%, black);
+  border: 3px solid var(--hero-ink);
+  box-shadow: 8px 8px 0 0 var(--hero-accent);
   padding: 2rem 2.25rem 1.75rem;
 }
 
-.manifesto-stop-card--gold {
-  background: var(--scene-manifesto-gold);
-  color: var(--scene-manifesto-bg);
+.manifesto-stop-card--gold,
+.manifesto-stop-card--cobalt {
+  background: var(--hero-bg);
+  color: var(--hero-ink);
 }
 
-.manifesto-stop-card--red {
-  background: var(--scene-manifesto-accent);
-  color: var(--scene-manifesto-ink);
+.manifesto-stop-card--red,
+.manifesto-stop-card--pink {
+  background: var(--hero-accent);
+  color: var(--hero-ink);
+  box-shadow: 8px 8px 0 0 var(--hero-bg);
+}
+
+.manifesto-stop-card__body {
+  font-family: var(--font-ibm-plex-mono), ui-monospace, monospace;
+  font-size: clamp(0.75rem, 2vw, 0.9rem);
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.9;
 }
 
 .manifesto-stop-card__label {
@@ -984,12 +1292,6 @@ html.desi-cursor-active button {
   line-height: 0.92;
   margin-bottom: 0.75rem;
   letter-spacing: 0.03em;
-}
-
-.manifesto-stop-card__body {
-  font-size: clamp(0.9rem, 2vw, 1.05rem);
-  line-height: 1.55;
-  opacity: 0.85;
 }
 
 .manifesto-marker {

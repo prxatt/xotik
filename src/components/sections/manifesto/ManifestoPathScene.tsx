@@ -33,7 +33,7 @@ function ManifestoStopCard({
       <article className={`manifesto-stop-card ${index % 2 === 0 ? "manifesto-stop-card--gold" : "manifesto-stop-card--red"}`}>
         <span className="manifesto-stop-card__label font-receipt">{t(stop.label, locale)}</span>
         <h2 className="manifesto-stop-card__title font-condensed">{t(stop.title, locale)}</h2>
-        <p className="manifesto-stop-card__body font-body">{t(stop.body, locale)}</p>
+        <p className="manifesto-stop-card__body font-receipt">{t(stop.body, locale)}</p>
         <div className="manifesto-marker" aria-hidden />
       </article>
     </div>
@@ -64,7 +64,7 @@ export function ManifestoPathScene({ locale, tier }: ManifestoPathSceneProps) {
           <p className="font-receipt text-[11px] tracking-[0.22em] text-scene-accent">
             05 · {t(copy.manifesto.intro, locale)}
           </p>
-          <h2 className="font-condensed mt-4 text-[clamp(2.5rem,10vw,5rem)] leading-[0.88] text-scene-ink">
+          <h2 className="font-condensed mt-4 text-[clamp(2.5rem,10vw,5rem)] leading-[0.88] text-scene-surface">
             {tLines(copy.manifesto.headline, locale).map((line) => (
               <span key={line} className="block">
                 {line}
