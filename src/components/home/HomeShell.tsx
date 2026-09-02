@@ -4,8 +4,8 @@ import { copy } from "@/lib/copy";
 import { useLanguage } from "@/context/LanguageContext";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { MobileMenu } from "@/components/layout/MobileMenu";
+import { HeroBlock } from "@/components/sections/HeroBlock";
 import { StreetFactoryBlock } from "@/components/sections/StreetFactoryBlock";
-import { HeroIntro } from "@/components/sections/StreetSection";
 import { ProductSection } from "@/components/sections/ProductSection";
 import { IngredientsSection } from "@/components/sections/IngredientsSection";
 import { ManifestoSection } from "@/components/sections/ManifestoSection";
@@ -32,7 +32,7 @@ export function HomeShell() {
       />
 
       <main id="main">
-        <HeroIntro locale={locale} />
+        <HeroBlock locale={locale} />
         <StreetFactoryBlock locale={locale} />
         <ProductSection locale={locale} />
         <IngredientsSection locale={locale} />
