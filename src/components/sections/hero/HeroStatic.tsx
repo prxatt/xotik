@@ -14,7 +14,7 @@ export function HeroStatic({ locale }: HeroStaticProps) {
   return (
     <section
       id="hero"
-      className="scene-shell texture-grain relative flex min-h-[100dvh] flex-col justify-end bg-cine-jaguar px-[var(--section-pad-x)] pb-12 pt-24 text-paper md:px-[var(--section-pad-x-desktop)]"
+      className="scene-shell texture-grain relative flex min-h-[100dvh] flex-col justify-center px-[var(--section-pad-x)] pb-12 pt-24 text-paper md:justify-end md:px-[var(--section-pad-x-desktop)]"
       data-scene="manifesto"
     >
       <div className="mx-auto w-full max-w-[1280px]">

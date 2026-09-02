@@ -59,6 +59,11 @@ export function HeroKineticScene({ locale, tier }: HeroKineticSceneProps) {
     const accentWords = accent?.querySelectorAll<HTMLElement>(".kinetic-word") ?? [];
 
     const ctx = gsap.context(() => {
+      gsap.set(words, { yPercent: 0, opacity: 1 });
+      if (accentWords.length > 0) gsap.set(accentWords, { yPercent: 0, opacity: 1 });
+      gsap.set(sub, { opacity: 1, y: 0 });
+      gsap.set(cta, { opacity: 1, y: 0 });
+
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: root,
@@ -112,6 +117,8 @@ export function HeroKineticScene({ locale, tier }: HeroKineticSceneProps) {
       );
 
       tl.to({}, { duration: TIMELINE_END - scene.typeEnd, ease: "none" }, scene.typeEnd);
+
+      ScrollTrigger.refresh();
     }, root);
 
     return () => ctx.revert();
@@ -125,7 +132,10 @@ export function HeroKineticScene({ locale, tier }: HeroKineticSceneProps) {
       className="relative"
       style={{ height: `${config.totalVh}vh`, minHeight: `${config.totalVh}vh` }}
     >
-      <div className="scene-shell texture-grain sticky top-0 flex h-[100dvh] min-h-[100dvh] flex-col justify-end overflow-hidden bg-cine-jaguar px-[var(--section-pad-x)] pb-12 pt-24 text-paper md:px-[var(--section-pad-x-desktop)]">
+      <div
+        className="scene-shell texture-grain sticky top-0 flex h-[100dvh] min-h-[100dvh] flex-col justify-center overflow-hidden px-[var(--section-pad-x)] pb-12 pt-24 text-paper md:justify-end md:px-[var(--section-pad-x-desktop)]"
+        data-scene="manifesto"
+      >
         <div ref={typeRef} className="mx-auto w-full max-w-[1280px]">
           {showDevanagariAccent && (
             <p
@@ -135,7 +145,7 @@ export function HeroKineticScene({ locale, tier }: HeroKineticSceneProps) {
               <WordSplit text={copy.hero.devanagariAccent} />
             </p>
           )}
-          <h1 className="font-condensed max-w-[12ch] text-[clamp(3.5rem,15vw,8.5rem)] leading-[0.8]">
+          <h1 className="font-condensed max-w-[12ch] text-[clamp(3.5rem,15vw,8.5rem)] leading-[0.8] text-paper">
             {headlines.map((line) => (
               <span key={line} className="block">
                 <WordSplit text={line} />
