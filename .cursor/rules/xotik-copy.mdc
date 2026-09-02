@@ -1,0 +1,26 @@
+---
+description: Copy voice and stop-slop rules for Xotik/J user-facing text.
+globs:
+  - src/lib/copy.ts
+  - src/**/*.tsx
+alwaysApply: false
+---
+
+# Xotik copy
+
+## Voice
+
+- English-clean default; Hinglish toggle for Gen Z lines
+- Active voice, specific claims only (verified product language)
+- No competitor names in user-facing copy
+
+## stop-slop
+
+- No filler openers ("Here's what…", "In today's world…")
+- No invented metrics or fake press
+- No em dashes in marketing copy
+- Headlines: roman weight/color emphasis, not italic display type
+
+## Source of truth
+
+All EN/Hinglish strings live in `src/lib/copy.ts`. Do not scatter duplicate strings.

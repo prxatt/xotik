@@ -1,0 +1,30 @@
+---
+description: Performance tiers, asset budgets, and progressive enhancement for Xotik 3D site.
+globs:
+  - src/**/*
+alwaysApply: false
+---
+
+# Xotik performance
+
+## Capability tiers
+
+- Tier 0: static AVIF/WebP + CSS (reduced motion, saveData, WebGL fail)
+- Tier 1: parallax / image sequences / Lottie — no full R3F scene
+- Tier 2: R3F + GSAP full experience
+
+Use `detectCapabilityTier()` / `useCapabilityTierContext()`. Never block first paint on WebGL.
+
+## Asset budgets (hard)
+
+- Hero still: 120–220 KB
+- Mobile GLB: ≤300 KB
+- Desktop GLB: ≤450 KB
+- Initial page (pre-3D): ≤450 KB
+- Total Tier 2 homepage: ≤2.5 MB
+
+## India / mobile
+
+- Test 360 / 390 / 430 breakpoints
+- `overflow-x: clip` on html and body
+- Lazy-load 3D after hero paint

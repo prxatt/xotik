@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+/* ── Xotik / J design tokens (Phase 0.2) ── */
+:root {
+  --paper: #fff9e9;
+  --ink: #173f2c;
+  --white: #ffffff;
+  --line: #d7d0bf;
+
+  --j-coral: #e84a3a;
+  --j-orange: #f28c28;
+  --j-yellow: #f3c743;
+  --j-green: #2e9b66;
+  --j-blue: #2d5be3;
+  --j-violet: #ae3fb6;
+
+  --header-solid: rgb(255 249 233 / 0.92);
+  --section-pad-x: 20px;
+  --section-pad-x-desktop: 32px;
+  --radius-pill: 100px;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-white: var(--white);
+  --color-line: var(--line);
+  --color-j-coral: var(--j-coral);
+  --color-j-orange: var(--j-orange);
+  --color-j-yellow: var(--j-yellow);
+  --color-j-green: var(--j-green);
+  --color-j-blue: var(--j-blue);
+  --color-j-violet: var(--j-violet);
+
+  --font-display: var(--font-fraunces);
+  --font-body: var(--font-manrope);
+  --font-label: var(--font-ibm-plex-mono);
+  --font-hindi: var(--font-noto-devanagari);
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: clip;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  overflow-x: clip;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Typography roles */
+.font-display {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: normal;
+}
+
+.font-body {
+  font-family: var(--font-manrope), system-ui, sans-serif;
+}
+
+.font-label {
+  font-family: var(--font-ibm-plex-mono), ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.font-hindi {
+  font-family: var(--font-noto-devanagari), var(--font-manrope), sans-serif;
+}
+
+/* Primary CTA */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 13px 24px;
+  border-radius: var(--radius-pill);
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-ibm-plex-mono), ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: opacity 200ms ease;
+}
+
+.btn-primary:hover {
+  opacity: 0.88;
+}
+
+.btn-primary:focus-visible {
+  outline: 2px solid var(--j-blue);
+  outline-offset: 3px;
+}

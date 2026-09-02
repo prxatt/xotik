@@ -1,0 +1,34 @@
+---
+description: Xotik/J design tokens, typography, and anti-slop UI rules. Apply when building pages, components, or visual polish.
+globs:
+  - src/**/*.tsx
+  - src/**/*.css
+alwaysApply: false
+---
+
+# Xotik design system
+
+## Colors (use CSS variables only)
+
+- Structural: `--paper`, `--ink`, `--line`, `--white`
+- J spectrum: `--j-coral` through `--j-violet` — one dominant accent per scene, never all six as a rainbow gradient
+
+## Typography
+
+- Display: Fraunces, roman only (no italic headers)
+- Body: Manrope
+- Labels: IBM Plex Mono, uppercase, letter-spacing 0.08em
+- Hindi: Noto Sans Devanagari subset when locale is hinglish
+
+## Components
+
+- Primary CTA: `.btn-primary` — ink bg, paper text, pill radius
+- Section padding: 20px mobile, 32px desktop
+- Max content width: 1280px
+
+## Do not
+
+- Introduce colors outside the token set without adding a named variable
+- Use generic AI dashboard patterns (purple gradients, glass blobs)
+- Invent metrics, press quotes, or certification claims
+- Copy user reference art pixels — mood and palette only
