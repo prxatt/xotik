@@ -18,6 +18,30 @@ type StreetParallaxSceneProps = {
   tier: 1 | 2;
 };
 
+/** Parallax travel must stay within layer overscan to avoid clipped gaps. */
+const PARALLAX = {
+  1: {
+    sectionClass: "h-[160vh] min-h-[160vh]",
+    bgInset: "18%",
+    fgInset: "22%",
+    bgY: { from: -2, to: 7 },
+    fgY: { from: -4, to: 11 },
+    copyY: { from: 0, to: -4 },
+    copyOpacity: 0.94,
+    scrub: 1,
+  },
+  2: {
+    sectionClass: "h-[220vh] min-h-[220vh]",
+    bgInset: "20%",
+    fgInset: "26%",
+    bgY: { from: -3, to: 10 },
+    fgY: { from: -5, to: 14 },
+    copyY: { from: 0, to: -8 },
+    copyOpacity: 0.88,
+    scrub: 0.65,
+  },
+} as const;
+
 function waitForImages(container: HTMLElement): Promise<void> {
   const images = Array.from(container.querySelectorAll("img"));
   if (images.length === 0) return Promise.resolve();
@@ -41,11 +65,7 @@ export function StreetParallaxScene({ locale, tier }: StreetParallaxSceneProps) 
   const bgRef = useRef<HTMLDivElement>(null);
   const fgRef = useRef<HTMLDivElement>(null);
   const copyRef = useRef<HTMLDivElement>(null);
-
-  const scrollHeight = tier === 2 ? "min(220vh, 1800px)" : "min(160vh, 1200px)";
-  const bgTravel = tier === 2 ? 16 : 9;
-  const fgTravel = tier === 2 ? 26 : 14;
-  const copyTravel = tier === 2 ? -10 : -5;
+  const config = PARALLAX[tier];
 
   useEffect(() => {
     const root = rootRef.current;
@@ -68,26 +88,31 @@ export function StreetParallaxScene({ locale, tier }: StreetParallaxSceneProps) 
           trigger: root,
           start: "top top",
           end: "bottom bottom",
-          scrub: tier === 2 ? 0.65 : 1,
+          scrub: config.scrub,
           invalidateOnRefresh: true,
         };
 
         gsap.fromTo(
           bg,
-          { yPercent: -4 },
-          { yPercent: bgTravel, ease: "none", scrollTrigger: scrollConfig },
+          { yPercent: config.bgY.from },
+          { yPercent: config.bgY.to, ease: "none", scrollTrigger: scrollConfig },
         );
 
         gsap.fromTo(
           fg,
-          { yPercent: -6 },
-          { yPercent: fgTravel, ease: "none", scrollTrigger: scrollConfig },
+          { yPercent: config.fgY.from },
+          { yPercent: config.fgY.to, ease: "none", scrollTrigger: scrollConfig },
         );
 
         gsap.fromTo(
           copy,
-          { yPercent: 0, opacity: 1 },
-          { yPercent: copyTravel, opacity: tier === 2 ? 0.88 : 0.94, ease: "none", scrollTrigger: scrollConfig },
+          { yPercent: config.copyY.from, opacity: 1 },
+          {
+            yPercent: config.copyY.to,
+            opacity: config.copyOpacity,
+            ease: "none",
+            scrollTrigger: scrollConfig,
+          },
         );
       }, root);
 
@@ -98,20 +123,25 @@ export function StreetParallaxScene({ locale, tier }: StreetParallaxSceneProps) 
       cancelled = true;
       ctx?.revert();
     };
-  }, [tier, bgTravel, fgTravel, copyTravel]);
+  }, [tier, config]);
 
   return (
     <section
       ref={rootRef}
       id="street"
       aria-label="Indian street scene"
-      className="relative"
-      style={{ height: scrollHeight }}
+      className={`relative ${config.sectionClass}`}
     >
-      <div className="sticky top-0 h-[100dvh] overflow-hidden">
+      <div className="sticky top-0 h-[100dvh] min-h-[100dvh] overflow-hidden">
         <div
           ref={bgRef}
-          className="absolute inset-[-6%] will-change-transform"
+          className="absolute will-change-transform"
+          style={{
+            top: `-${config.bgInset}`,
+            right: `-${config.bgInset}`,
+            bottom: `-${config.bgInset}`,
+            left: `-${config.bgInset}`,
+          }}
           aria-hidden
         >
           <StreetSeaImage priority />
@@ -119,9 +149,15 @@ export function StreetParallaxScene({ locale, tier }: StreetParallaxSceneProps) 
 
         <div
           ref={fgRef}
-          className={`absolute inset-[-10%] will-change-transform mix-blend-multiply ${
+          className={`absolute will-change-transform mix-blend-multiply ${
             tier === 2 ? "opacity-35" : "opacity-40"
           }`}
+          style={{
+            top: `-${config.fgInset}`,
+            right: `-${config.fgInset}`,
+            bottom: `-${config.fgInset}`,
+            left: `-${config.fgInset}`,
+          }}
           aria-hidden
         >
           <StreetMonsoonImage />
