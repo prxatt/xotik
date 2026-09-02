@@ -64,7 +64,7 @@ export function SiteHeader({
             {locale === "en" ? "EN / HI" : "HI / EN"}
           </button>
 
-          <Link href="#meet-j" className="btn-primary hidden sm:inline-flex">
+          <Link href="#product" className="btn-primary hidden sm:inline-flex">
             {t(copy.header.cta, locale)}
           </Link>
 
