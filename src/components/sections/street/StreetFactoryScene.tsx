@@ -54,6 +54,12 @@ const SCENE = {
   },
 } as const;
 
+/** Anchor sits along pin scroll distance (section − viewport), not full section height. */
+function factoryAnchorTopVh(totalVh: number, crossfadeComplete: number): number {
+  const pinScrollVh = Math.max(totalVh - 100, 0);
+  return crossfadeComplete * pinScrollVh;
+}
+
 function refreshAfterImages(container: HTMLElement): Promise<void> {
   const images = Array.from(container.querySelectorAll("img"));
   if (images.length === 0) return Promise.resolve();
@@ -260,7 +266,7 @@ export function StreetFactoryScene({ locale, tier }: StreetFactorySceneProps) {
         tabIndex={-1}
         className="pointer-events-none absolute left-0 h-px w-px opacity-0"
         style={{
-          top: `${config.crossfadeComplete * 100}%`,
+          top: `${factoryAnchorTopVh(config.totalVh, config.crossfadeComplete)}vh`,
           scrollMarginTop: "5rem",
         }}
         aria-label="Factory"

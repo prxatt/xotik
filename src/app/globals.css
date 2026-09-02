@@ -80,6 +80,10 @@
   --color-cine-gold: var(--cine-gold);
   --color-cine-olive: var(--cine-olive);
   --color-retro-royal: var(--retro-royal);
+  --color-scene-bg: var(--scene-bg);
+  --color-scene-ink: var(--scene-ink);
+  --color-scene-surface: var(--scene-surface);
+  --color-scene-accent: var(--scene-accent);
 
   --font-display: var(--font-fraunces);
   --font-condensed: var(--font-bebas);

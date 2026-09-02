@@ -37,7 +37,7 @@ const ibmPlexMono = IBM_Plex_Mono({
 const notoDevanagari = Noto_Sans_Devanagari({
   variable: "--font-noto-devanagari",
   subsets: ["devanagari"],
-  weight: ["400", "500", "600"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
