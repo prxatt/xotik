@@ -205,7 +205,8 @@ body {
   --scene-bg: var(--hero-bg);
   --scene-ink: var(--hero-ink);
   --scene-accent: var(--hero-accent);
-  --scene-surface: var(--hero-surface);
+  /* Display text on cobalt — yellow, not dark hero-surface */
+  --scene-surface: var(--hero-ink);
 }
 
 .scene-shell[data-scene="taste"] {
@@ -237,14 +238,18 @@ body {
   --shell-ink: var(--hero-ink);
   --shell-accent: var(--hero-accent);
   --shell-surface: var(--hero-surface);
+  --shell-ribbon-fg: var(--hero-bg);
+  --shell-ribbon-b-bg: var(--shell-ink);
+  --shell-ribbon-b-fg: var(--shell-surface);
   --shell-grid-strength: 10%;
 }
 
-.desi-pop-shell[data-scene="street"],
-.desi-pop-shell[data-scene="factory"] {
+.desi-pop-shell[data-scene="street"].desi-pop-shell--overlay,
+.desi-pop-shell[data-scene="factory"].desi-pop-shell--overlay {
   --shell-bg: transparent;
   --shell-ink: var(--hero-ink);
   --shell-accent: var(--hero-accent);
+  --shell-ribbon-fg: var(--hero-bg);
 }
 
 .desi-pop-shell[data-scene="factory"]:not(.desi-pop-shell--overlay) {
@@ -259,6 +264,8 @@ body {
   --shell-ink: var(--hero-ink);
   --shell-accent: var(--hero-accent);
   --shell-surface: var(--hero-surface);
+  --shell-ribbon-fg: var(--hero-bg);
+  --shell-ribbon-b-fg: var(--hero-surface);
 }
 
 .desi-pop-shell[data-scene="taste"] {
@@ -290,12 +297,17 @@ body {
 }
 
 .desi-pop-shell--overlay .desi-pop-shell__bg,
-.desi-pop-shell--overlay .desi-pop-shell__glow {
-  opacity: 0;
+.desi-pop-shell--overlay .desi-pop-shell__glow,
+.desi-pop-shell--overlay .desi-pop-shell__ribbon {
+  display: none;
 }
 
 .desi-pop-shell--overlay .desi-pop-shell__halftone {
   opacity: 0.06;
+}
+
+.desi-pop-shell--overlay .desi-pop-shell__grain {
+  opacity: 0.1;
 }
 
 .desi-pop-shell__content {
@@ -336,30 +348,30 @@ body {
   position: absolute;
   left: -25%;
   width: 150%;
-  z-index: 2;
+  z-index: 1;
   overflow: hidden;
   background: var(--shell-accent);
-  color: var(--shell-bg);
+  color: var(--shell-ribbon-fg);
   font-family: var(--font-bebas), Impact, sans-serif;
-  font-size: clamp(0.65rem, 2vw, 0.95rem);
-  letter-spacing: 0.28em;
+  font-size: clamp(0.5rem, 1.6vw, 0.85rem);
+  letter-spacing: 0.22em;
   line-height: 1;
-  padding: 0.35rem 0;
+  padding: 0.3rem 0;
   white-space: nowrap;
   pointer-events: none;
-  opacity: 0.92;
+  opacity: 0.82;
 }
 
 .desi-pop-shell__ribbon--a {
-  top: 12%;
-  transform: rotate(-10deg);
+  top: 9%;
+  transform: rotate(-8deg);
 }
 
 .desi-pop-shell__ribbon--b {
-  bottom: 16%;
-  transform: rotate(6deg);
-  background: var(--shell-ink);
-  color: var(--shell-surface);
+  bottom: 11%;
+  transform: rotate(5deg);
+  background: var(--shell-ribbon-b-bg);
+  color: var(--shell-ribbon-b-fg);
 }
 
 .desi-pop-shell__ribbon span {
@@ -716,22 +728,6 @@ body {
   box-shadow: 1px 1px 0 0 var(--hero-accent);
 }
 
-.desi-pop-shell__ribbon {
-  z-index: 1;
-  font-size: clamp(0.5rem, 1.6vw, 0.85rem);
-  opacity: 0.75;
-}
-
-.desi-pop-shell__ribbon--a {
-  top: 9%;
-  transform: rotate(-8deg);
-}
-
-.desi-pop-shell__ribbon--b {
-  bottom: 11%;
-  transform: rotate(5deg);
-}
-
 .hero-billboard__ribbon span {
   display: inline-block;
   padding-left: 0.5rem;
@@ -971,7 +967,8 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-billboard__ribbon span {
+  .hero-billboard__ribbon span,
+  .desi-pop-shell__ribbon span {
     animation: none;
   }
 
