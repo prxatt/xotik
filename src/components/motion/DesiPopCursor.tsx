@@ -70,9 +70,16 @@ export function DesiPopCursor() {
     const labelEl = labelRef.current;
     if (!cursor || !ring || !dot || !labelEl) return;
 
+    hotRef.current = false;
+    pressingRef.current = false;
     labelStateRef.current = DEFAULT_LABEL;
+    setIsHot(false);
+    setIsPressing(false);
+    setLabel(DEFAULT_LABEL);
 
     gsap.set(cursor, { left: window.innerWidth / 2, top: window.innerHeight / 2 });
+    gsap.set(ring, { scale: RING_IDLE });
+    gsap.set(dot, { scale: DOT_IDLE });
     gsap.set(labelEl, {
       left: "50%",
       xPercent: -50,
@@ -183,6 +190,8 @@ export function DesiPopCursor() {
       window.removeEventListener("mouseup", onUp);
       window.removeEventListener("blur", onBlur);
       gsap.ticker.remove(ticker);
+      hotRef.current = false;
+      pressingRef.current = false;
     };
   }, [enabled]);
 
