@@ -10,6 +10,23 @@ import { DESKTOP_MENU_MQ } from "@/lib/breakpoints";
 const LERP = 0.28;
 const DEFAULT_LABEL = "J";
 
+const RING_IDLE = 1;
+const RING_HOT = 1.45;
+const RING_PRESS_MUL = 0.82;
+const DOT_IDLE = 1;
+const DOT_HOT = 1.35;
+const DOT_PRESS = 0.65;
+
+function ringScale(hot: boolean, pressing: boolean) {
+  const base = hot ? RING_HOT : RING_IDLE;
+  return pressing ? base * RING_PRESS_MUL : base;
+}
+
+function dotScale(hot: boolean, pressing: boolean) {
+  if (pressing) return DOT_PRESS;
+  return hot ? DOT_HOT : DOT_IDLE;
+}
+
 /**
  * Tier 2 desktop-only cursor — dot + ring + hover label pill.
  */
@@ -56,14 +73,47 @@ export function DesiPopCursor() {
     labelStateRef.current = DEFAULT_LABEL;
 
     gsap.set(cursor, { left: window.innerWidth / 2, top: window.innerHeight / 2 });
-    gsap.set(ring, { scale: 1 });
-    gsap.set(dot, { scale: 1 });
-    gsap.set(labelEl, { opacity: 0, y: 8, scale: 0.92 });
+    gsap.set(labelEl, {
+      left: "50%",
+      xPercent: -50,
+      opacity: 0,
+      y: 8,
+      scale: 0.92,
+      transformOrigin: "50% 0%",
+    });
 
     const pos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     const mouse = { x: pos.x, y: pos.y };
     const leftSet = gsap.quickSetter(cursor, "left", "px");
     const topSet = gsap.quickSetter(cursor, "top", "px");
+
+    function applyVisuals(options?: { pressingEase?: string; pressingDuration?: number }) {
+      const hot = hotRef.current;
+      const pressing = pressingRef.current;
+
+      gsap.to(ring, {
+        scale: ringScale(hot, pressing),
+        duration: options?.pressingDuration ?? 0.24,
+        ease: options?.pressingEase ?? "power3.out",
+        overwrite: true,
+      });
+      gsap.to(dot, {
+        scale: dotScale(hot, pressing),
+        duration: options?.pressingDuration ?? 0.18,
+        ease: options?.pressingEase ?? "power2.out",
+        overwrite: true,
+      });
+      gsap.to(labelEl, {
+        opacity: hot ? 1 : 0,
+        left: "50%",
+        xPercent: -50,
+        y: hot ? 14 : 8,
+        scale: hot ? 1 : 0.92,
+        duration: 0.22,
+        ease: "power2.out",
+        overwrite: true,
+      });
+    }
 
     function setHot(nextHot: boolean, nextLabel: string) {
       const displayLabel = nextHot ? nextLabel : DEFAULT_LABEL;
@@ -73,47 +123,16 @@ export function DesiPopCursor() {
       labelStateRef.current = displayLabel;
       setIsHot(nextHot);
       setLabel(displayLabel);
-
-      const pressScale = pressingRef.current ? 0.88 : 1;
-      gsap.to(ring, {
-        scale: (nextHot ? 1.45 : 1) * pressScale,
-        duration: 0.28,
-        ease: "power3.out",
-        overwrite: true,
-      });
-      gsap.to(dot, {
-        scale: nextHot ? 1.35 : 1,
-        duration: 0.22,
-        ease: "power2.out",
-        overwrite: true,
-      });
-      gsap.to(labelEl, {
-        opacity: nextHot ? 1 : 0,
-        y: nextHot ? 14 : 8,
-        scale: nextHot ? 1 : 0.92,
-        duration: 0.24,
-        ease: "power2.out",
-        overwrite: true,
-      });
+      applyVisuals();
     }
 
     function setPressing(nextPressing: boolean) {
       if (pressingRef.current === nextPressing) return;
       pressingRef.current = nextPressing;
       setIsPressing(nextPressing);
-
-      const base = hotRef.current ? 1.45 : 1;
-      gsap.to(ring, {
-        scale: nextPressing ? base * 0.82 : base,
-        duration: nextPressing ? 0.1 : 0.32,
-        ease: nextPressing ? "power2.in" : "elastic.out(1, 0.55)",
-        overwrite: true,
-      });
-      gsap.to(dot, {
-        scale: nextPressing ? 0.65 : hotRef.current ? 1.35 : 1,
-        duration: 0.12,
-        ease: "power2.out",
-        overwrite: true,
+      applyVisuals({
+        pressingDuration: nextPressing ? 0.1 : 0.32,
+        pressingEase: nextPressing ? "power2.in" : "elastic.out(1, 0.55)",
       });
     }
 
@@ -141,6 +160,8 @@ export function DesiPopCursor() {
     function onBlur() {
       setPressing(false);
     }
+
+    applyVisuals();
 
     const ticker = () => {
       const dt = 1 - Math.pow(1 - LERP, gsap.ticker.deltaRatio());

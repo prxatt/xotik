@@ -1052,7 +1052,6 @@ html.desi-cursor-active *::after {
   position: absolute;
   left: 50%;
   top: 50%;
-  transform: translateX(-50%);
   margin-top: 0;
   padding: 0.2rem 0.55rem;
   border-radius: 999px;
@@ -1064,6 +1063,7 @@ html.desi-cursor-active *::after {
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
+  transform-origin: 50% 0%;
 }
 
 /* ── Product editorial (Jeeru-first) ── */
