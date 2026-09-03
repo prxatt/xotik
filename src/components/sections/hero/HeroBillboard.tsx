@@ -33,7 +33,6 @@ export function HeroBillboard({
       <div ref={sheetRef} className="hero-stamp-sheet">
         <div className="hero-billboard__bg" aria-hidden />
         <div className="hero-billboard__glow" aria-hidden />
-        <div className="hero-stamp-sheet__grid" aria-hidden />
         <div className="hero-stamp-sheet__perforation" aria-hidden />
 
         <div className="hero-billboard__ribbon hero-billboard__ribbon--a" aria-hidden>
@@ -52,8 +51,10 @@ export function HeroBillboard({
         ) : null}
 
         {handoffLabel ? (
-          <div ref={handoffRef} className="hero-handoff font-condensed" aria-hidden>
-            {handoffLabel}
+          <div className="hero-handoff">
+            <div ref={handoffRef} className="hero-handoff__inner font-condensed" aria-hidden>
+              {handoffLabel}
+            </div>
           </div>
         ) : null}
 
@@ -75,7 +76,7 @@ type HeroBillboardCopyProps = {
   headlineRef?: React.RefObject<HTMLHeadingElement | null>;
   subRef?: React.RefObject<HTMLParagraphElement | null>;
   ctaRef?: React.RefObject<HTMLDivElement | null>;
-  stampRef?: React.RefObject<HTMLDivElement | null>;
+  stampRef?: React.RefObject<HTMLSpanElement | null>;
 };
 
 function splitHeroSub(sub: string): string[] {
@@ -89,6 +90,16 @@ function stampLines(stampText: string): string[] {
   const pieces = stampText.trim().split(/\s+/);
   if (pieces.length <= 1) return [stampText];
   return [pieces[0] ?? stampText, pieces.slice(1).join(" ")];
+}
+
+function stampAnchorIndex(line: string): number {
+  const chars = [...line];
+  const d = chars.findIndex((char) => char.toUpperCase() === "D");
+  if (d !== -1) return d;
+  for (let i = chars.length - 1; i >= 0; i -= 1) {
+    if (/\p{L}/u.test(chars[i] ?? "")) return i;
+  }
+  return Math.max(0, chars.length - 1);
 }
 
 export function HeroBillboardCopy({
@@ -129,27 +140,42 @@ export function HeroBillboardCopy({
           </svg>
 
           <h1 ref={headlineRef} className="hero-headline font-condensed">
-            {headlines.map((line, index) => (
-              <span
-                key={line}
-                className={`hero-headline__line${
-                  index === headlines.length - 1 ? " hero-headline__line--accent" : ""
-                }`}
-              >
-                {line}
-              </span>
-            ))}
-          </h1>
+            {headlines.map((line, index) => {
+              const isLast = index === headlines.length - 1;
+              const seal =
+                isLast && stampText ? (
+                  <span ref={stampRef} className="hero-fizz-seal" aria-hidden>
+                    {fizzRows.map((row) => (
+                      <span key={row} className="hero-fizz-seal__line">
+                        {row}
+                      </span>
+                    ))}
+                  </span>
+                ) : null;
 
-          {stampText ? (
-            <div ref={stampRef} className="hero-fizz-seal" aria-hidden>
-              {fizzRows.map((row) => (
-                <span key={row} className="hero-fizz-seal__line">
-                  {row}
+              if (!seal) {
+                return (
+                  <span key={line} className="hero-headline__line">
+                    {line}
+                  </span>
+                );
+              }
+
+              const chars = [...line];
+              const anchor = stampAnchorIndex(line);
+
+              return (
+                <span key={line} className="hero-headline__line hero-headline__line--accent">
+                  {chars.slice(0, anchor).join("")}
+                  <span className="hero-headline__mark">
+                    {chars[anchor]}
+                    {seal}
+                  </span>
+                  {chars.slice(anchor + 1).join("")}
                 </span>
-              ))}
-            </div>
-          ) : null}
+              );
+            })}
+          </h1>
         </div>
 
         {showDevanagariAccent ? (
