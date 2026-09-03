@@ -32,7 +32,6 @@ export function HeroBillboard({
     <div ref={frameRef} className="hero-paper">
       <div ref={sheetRef} className="hero-stamp-sheet">
         <div className="hero-billboard__bg" aria-hidden />
-        <div className="hero-billboard__glow" aria-hidden />
         <div className="hero-stamp-sheet__perforation" aria-hidden />
 
         <div className="hero-billboard__ribbon hero-billboard__ribbon--a" aria-hidden>
@@ -92,10 +91,19 @@ function stampLines(stampText: string): string[] {
   return [pieces[0] ?? stampText, pieces.slice(1).join(" ")];
 }
 
+function stampLineIndex(headlines: readonly string[]): number {
+  const sized = headlines.findIndex((line) => /sized/i.test(line));
+  if (sized !== -1) return sized;
+  const withD = headlines.findIndex((line) => [...line].some((char) => char.toUpperCase() === "D"));
+  if (withD !== -1) return withD;
+  return 0;
+}
+
 function stampAnchorIndex(line: string): number {
   const chars = [...line];
-  const d = chars.findIndex((char) => char.toUpperCase() === "D");
-  if (d !== -1) return d;
+  for (let i = chars.length - 1; i >= 0; i -= 1) {
+    if (chars[i]?.toUpperCase() === "D") return i;
+  }
   for (let i = chars.length - 1; i >= 0; i -= 1) {
     if (/\p{L}/u.test(chars[i] ?? "")) return i;
   }
@@ -119,6 +127,7 @@ export function HeroBillboardCopy({
   const showDevanagariAccent = locale === "en";
   const subRows = splitHeroSub(sub);
   const fizzRows = stampText ? stampLines(stampText) : [];
+  const fizzLine = stampText ? stampLineIndex(headlines) : -1;
 
   return (
     <div className="hero-copy-layout">
@@ -142,8 +151,9 @@ export function HeroBillboardCopy({
           <h1 ref={headlineRef} className="hero-headline font-condensed">
             {headlines.map((line, index) => {
               const isLast = index === headlines.length - 1;
+              const lineClass = `hero-headline__line${isLast ? " hero-headline__line--accent" : ""}`;
               const seal =
-                isLast && stampText ? (
+                index === fizzLine ? (
                   <span ref={stampRef} className="hero-fizz-seal" aria-hidden>
                     {fizzRows.map((row) => (
                       <span key={row} className="hero-fizz-seal__line">
@@ -155,7 +165,7 @@ export function HeroBillboardCopy({
 
               if (!seal) {
                 return (
-                  <span key={line} className="hero-headline__line">
+                  <span key={line} className={lineClass}>
                     {line}
                   </span>
                 );
@@ -165,7 +175,7 @@ export function HeroBillboardCopy({
               const anchor = stampAnchorIndex(line);
 
               return (
-                <span key={line} className="hero-headline__line hero-headline__line--accent">
+                <span key={line} className={lineClass}>
                   {chars.slice(0, anchor).join("")}
                   <span className="hero-headline__mark">
                     {chars[anchor]}
