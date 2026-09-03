@@ -1,8 +1,146 @@
 import Image from "next/image";
+import { type RefObject } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { copy, t, tLines, type Locale } from "@/lib/copy";
+import { cloudinaryVideoUrl } from "@/lib/cloudinary";
+import { STREET_SCROLL_VIDEO_ID } from "@/lib/media";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export const STREET_SEA = "/assets/hero/street-sea-link.jpg";
 export const STREET_MONSOON = "/assets/hero/street-monsoon-market.jpg";
+
+const STREET_VIDEO_SRC = cloudinaryVideoUrl(STREET_SCROLL_VIDEO_ID);
+
+/** Safari will not paint seeks on a never-played element — kick the decoder once. */
+function waitForSeek(video: HTMLVideoElement, time: number): Promise<void> {
+  return new Promise((resolve) => {
+    const closeEnough =
+      Math.abs(video.currentTime - time) < 0.04 &&
+      video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA;
+
+    if (closeEnough) {
+      resolve();
+      return;
+    }
+
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      video.removeEventListener("seeked", finish);
+      resolve();
+    };
+
+    video.addEventListener("seeked", finish, { once: true });
+    video.currentTime = time;
+    window.setTimeout(finish, 500);
+  });
+}
+
+function primeStreetVideo(video: HTMLVideoElement): Promise<void> {
+  video.muted = true;
+  video.playsInline = true;
+  video.preload = "auto";
+
+  return video
+    .play()
+    .catch(() => undefined)
+    .then(() => {
+      video.pause();
+      return waitForSeek(video, 0);
+    });
+}
+
+function whenVideoCanScrub(video: HTMLVideoElement, onReady: () => void) {
+  if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA && video.duration > 0) {
+    onReady();
+    return;
+  }
+
+  const ready = () => {
+    if (video.duration > 0) onReady();
+  };
+
+  video.addEventListener("canplay", ready, { once: true });
+  video.addEventListener("loadedmetadata", ready, { once: true });
+}
+
+/** Bind scroll-scrubbed playback to a GSAP timeline segment. */
+export function bindStreetVideoScrub(
+  video: HTMLVideoElement,
+  timeline: gsap.core.Timeline,
+  segmentDuration: number,
+  position = 0,
+) {
+  const attach = () => {
+    const end = video.duration;
+    if (!Number.isFinite(end) || end <= 0) return;
+
+    timeline.fromTo(
+      video,
+      { currentTime: 0 },
+      {
+        currentTime: end,
+        ease: "none",
+        duration: segmentDuration,
+        immediateRender: false,
+        invalidateOnRefresh: false,
+      },
+      position,
+    );
+
+    timeline.scrollTrigger?.update();
+    ScrollTrigger.refresh();
+  };
+
+  let attached = false;
+  const attachOnce = () => {
+    if (attached) return;
+    attached = true;
+    attach();
+  };
+
+  void primeStreetVideo(video).then(() => whenVideoCanScrub(video, attachOnce));
+}
+
+function waitForVideoFrame(video: HTMLVideoElement): Promise<void> {
+  return new Promise((resolve) => {
+    if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+      resolve();
+      return;
+    }
+
+    video.addEventListener("canplay", () => resolve(), { once: true });
+    video.addEventListener("error", () => resolve(), { once: true });
+  });
+}
+
+export function waitForStreetMedia(container: HTMLElement): Promise<void> {
+  const images = Array.from(container.querySelectorAll("img"));
+  const videos = Array.from(container.querySelectorAll("video"));
+
+  const waits: Promise<void>[] = images.map(
+    (img) =>
+      new Promise<void>((resolve) => {
+        if (img.complete) resolve();
+        else {
+          img.addEventListener("load", () => resolve(), { once: true });
+          img.addEventListener("error", () => resolve(), { once: true });
+        }
+      }),
+  );
+
+  waits.push(...videos.map((video) => waitForVideoFrame(video)));
+
+  if (waits.length === 0) return Promise.resolve();
+
+  return Promise.race([
+    Promise.all(waits).then(() => undefined),
+    new Promise<void>((resolve) => window.setTimeout(resolve, 1500)),
+  ]);
+}
 
 export function StreetOverlay() {
   return (
@@ -53,6 +191,27 @@ export function StreetSeaImage({ priority = false }: { priority?: boolean }) {
       priority={priority}
       className="object-cover object-center"
       sizes="100vw"
+    />
+  );
+}
+
+export function StreetSeaVideo({
+  videoRef,
+  priority = false,
+}: {
+  videoRef?: RefObject<HTMLVideoElement | null>;
+  priority?: boolean;
+}) {
+  return (
+    <video
+      ref={videoRef}
+      className="absolute inset-0 h-full w-full object-cover object-center"
+      src={STREET_VIDEO_SRC}
+      poster={STREET_SEA}
+      muted
+      playsInline
+      preload={priority ? "auto" : "metadata"}
+      aria-hidden
     />
   );
 }

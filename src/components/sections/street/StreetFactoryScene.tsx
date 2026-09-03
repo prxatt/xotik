@@ -13,7 +13,9 @@ import {
   StreetCopy,
   StreetMonsoonImage,
   StreetOverlay,
-  StreetSeaImage,
+  StreetSeaVideo,
+  bindStreetVideoScrub,
+  waitForStreetMedia,
 } from "@/components/sections/street/StreetShared";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -61,32 +63,12 @@ function factoryAnchorTopVh(totalVh: number, crossfadeComplete: number): number 
   return crossfadeComplete * pinScrollVh;
 }
 
-function refreshAfterImages(container: HTMLElement): Promise<void> {
-  const images = Array.from(container.querySelectorAll("img"));
-  if (images.length === 0) return Promise.resolve();
-
-  return Promise.race([
-    Promise.all(
-      images.map(
-        (img) =>
-          new Promise<void>((resolve) => {
-            if (img.complete) resolve();
-            else {
-              img.addEventListener("load", () => resolve(), { once: true });
-              img.addEventListener("error", () => resolve(), { once: true });
-            }
-          }),
-      ),
-    ).then(() => undefined),
-    new Promise<void>((resolve) => window.setTimeout(resolve, 1200)),
-  ]);
-}
-
 export function StreetFactoryScene({ locale, tier }: StreetFactorySceneProps) {
   const rootRef = useRef<HTMLElement>(null);
   const streetGroupRef = useRef<HTMLDivElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
   const fgRef = useRef<HTMLDivElement>(null);
+  const streetVideoRef = useRef<HTMLVideoElement>(null);
   const streetCopyRef = useRef<HTMLDivElement>(null);
   const factoryGroupRef = useRef<HTMLDivElement>(null);
   const factoryCopyRef = useRef<HTMLDivElement>(null);
@@ -151,6 +133,11 @@ export function StreetFactoryScene({ locale, tier }: StreetFactorySceneProps) {
         0,
       );
 
+      const streetVideo = streetVideoRef.current;
+      if (streetVideo) {
+        bindStreetVideoScrub(streetVideo, tl, scene.parallaxEnd, 0);
+      }
+
       tl.to(
         streetGroup,
         {
@@ -187,7 +174,7 @@ export function StreetFactoryScene({ locale, tier }: StreetFactorySceneProps) {
       );
     }, root);
 
-    refreshAfterImages(root).then(() => {
+    waitForStreetMedia(root).then(() => {
       if (!cancelled) ScrollTrigger.refresh();
     });
 
@@ -229,7 +216,7 @@ export function StreetFactoryScene({ locale, tier }: StreetFactorySceneProps) {
             }}
             aria-hidden
           >
-            <StreetSeaImage priority />
+            <StreetSeaVideo videoRef={streetVideoRef} priority />
           </div>
 
           <div

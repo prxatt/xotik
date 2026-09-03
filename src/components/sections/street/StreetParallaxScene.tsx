@@ -8,7 +8,9 @@ import {
   StreetCopy,
   StreetMonsoonImage,
   StreetOverlay,
-  StreetSeaImage,
+  StreetSeaVideo,
+  bindStreetVideoScrub,
+  waitForStreetMedia,
 } from "@/components/sections/street/StreetShared";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -42,28 +44,11 @@ const PARALLAX = {
   },
 } as const;
 
-function waitForImages(container: HTMLElement): Promise<void> {
-  const images = Array.from(container.querySelectorAll("img"));
-  if (images.length === 0) return Promise.resolve();
-
-  return Promise.all(
-    images.map(
-      (img) =>
-        new Promise<void>((resolve) => {
-          if (img.complete) resolve();
-          else {
-            img.addEventListener("load", () => resolve(), { once: true });
-            img.addEventListener("error", () => resolve(), { once: true });
-          }
-        }),
-    ),
-  ).then(() => undefined);
-}
-
 export function StreetParallaxScene({ locale, tier }: StreetParallaxSceneProps) {
   const rootRef = useRef<HTMLElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
   const fgRef = useRef<HTMLDivElement>(null);
+  const streetVideoRef = useRef<HTMLVideoElement>(null);
   const copyRef = useRef<HTMLDivElement>(null);
   const config = PARALLAX[tier];
 
@@ -80,7 +65,7 @@ export function StreetParallaxScene({ locale, tier }: StreetParallaxSceneProps) 
     let ctx: gsap.Context | null = null;
     let cancelled = false;
 
-    waitForImages(root).then(() => {
+    waitForStreetMedia(root).then(() => {
       if (cancelled) return;
 
       ctx = gsap.context(() => {
@@ -92,28 +77,38 @@ export function StreetParallaxScene({ locale, tier }: StreetParallaxSceneProps) 
           invalidateOnRefresh: true,
         };
 
-        gsap.fromTo(
+        const tl = gsap.timeline({ scrollTrigger: scrollConfig });
+
+        tl.fromTo(
           bg,
           { yPercent: config.bgY.from },
-          { yPercent: config.bgY.to, ease: "none", scrollTrigger: scrollConfig },
+          { yPercent: config.bgY.to, ease: "none", duration: 1 },
+          0,
         );
 
-        gsap.fromTo(
+        tl.fromTo(
           fg,
           { yPercent: config.fgY.from },
-          { yPercent: config.fgY.to, ease: "none", scrollTrigger: scrollConfig },
+          { yPercent: config.fgY.to, ease: "none", duration: 1 },
+          0,
         );
 
-        gsap.fromTo(
+        tl.fromTo(
           copy,
           { yPercent: config.copyY.from, opacity: 1 },
           {
             yPercent: config.copyY.to,
             opacity: config.copyOpacity,
             ease: "none",
-            scrollTrigger: scrollConfig,
+            duration: 1,
           },
+          0,
         );
+
+        const streetVideo = streetVideoRef.current;
+        if (streetVideo) {
+          bindStreetVideoScrub(streetVideo, tl, 1, 0);
+        }
       }, root);
 
       ScrollTrigger.refresh();
@@ -144,7 +139,7 @@ export function StreetParallaxScene({ locale, tier }: StreetParallaxSceneProps) 
           }}
           aria-hidden
         >
-          <StreetSeaImage priority />
+          <StreetSeaVideo videoRef={streetVideoRef} priority />
         </div>
 
         <div

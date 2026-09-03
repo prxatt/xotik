@@ -6,19 +6,24 @@ This doc maps how **surface-tension-studio** (`~/Desktop/surface-tension-studio`
 
 | Asset | Path | Use |
 |-------|------|-----|
-| Street sea link | `public/assets/hero/street-sea-link.jpg` | Street scene BG |
+| Street sea link | `public/assets/hero/street-sea-link.jpg` | Street scene BG + video poster |
 | Street monsoon | `public/assets/hero/street-monsoon-market.jpg` | Street FG parallax |
 | Jeeru can | `public/assets/products/xotik-jeeru-can.jpg` | Product + manifesto traveler |
+| Street scroll video | Cloudinary `xotik/media/street/chai-stall-monsoon-breeze` | Tier 1/2 scroll scrub (CDN) |
 
 ## Pipeline stages (recommended order)
 
 ### 1. Image → video (scroll scrub)
 
-Generate short loops from stills (ChatGPT / Gemini / Runway / Kling):
+Generate short loops from stills (Kling / Runway) → upload to **Cloudinary** for CDN delivery:
 
-- `street-sea-link.jpg` → 3–5s orbit / slow push-in (street establishes scene)
+- `street-sea-link.jpg` → Kling rough gen → `xotik/media/street/chai-stall-monsoon-breeze` on Cloudinary
 - `xotik-jeeru-can.jpg` → can rises from street stall (alpha matte)
 - Factory still (TBD) → conveyor / steam loop
+
+Delivery URL pattern (auto quality, H.264, 1920w cap):
+
+`https://res.cloudinary.com/<cloud>/video/upload/q_auto:good,f_mp4,vc_auto,w_1920/<public_id>`
 
 Wire in xotik with `<video>` + GSAP `ScrollTrigger` scrub on `currentTime` (same pattern as hero pin).
 
