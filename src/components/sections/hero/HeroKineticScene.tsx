@@ -23,11 +23,13 @@ export function HeroKineticScene({ locale, tier }: HeroKineticSceneProps) {
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const subRef = useRef<HTMLParagraphElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
+  const handoffRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const root = rootRef.current;
     const pin = pinRef.current;
     const sheet = sheetRef.current;
+    const handoff = handoffRef.current;
     if (!root || !pin || !sheet) return;
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -51,11 +53,17 @@ export function HeroKineticScene({ locale, tier }: HeroKineticSceneProps) {
       tl.fromTo(
         sheet,
         { y: 0, opacity: 1 },
-        { y: -10, opacity: 1, ease: "none", duration: 0.72 },
+        { y: -8, opacity: 1, ease: "none", duration: 0.7 },
         0,
       );
 
-      tl.to(sheet, { opacity: 0, ease: "none", duration: 0.28 }, 0.72);
+      if (handoff) {
+        gsap.set(handoff, { opacity: 0, y: 20 });
+        tl.to(handoff, { opacity: 1, y: 0, ease: "none", duration: 0.18 }, 0.52);
+        tl.to(handoff, { opacity: 0, y: -12, ease: "none", duration: 0.12 }, 0.82);
+      }
+
+      tl.to(sheet, { opacity: 0, ease: "none", duration: 0.3 }, 0.7);
 
       ScrollTrigger.refresh();
     }, root);
@@ -65,10 +73,17 @@ export function HeroKineticScene({ locale, tier }: HeroKineticSceneProps) {
 
   return (
     <section ref={rootRef} id="hero" aria-label="Hero" className="hero-scroll-zone">
-      <HeroBillboard frameRef={pinRef} sheetRef={sheetRef}>
+      <HeroBillboard
+        frameRef={pinRef}
+        sheetRef={sheetRef}
+        ribbonText={copy.hero.ribbon}
+        garnishTop={t(copy.hero.garnish.top, locale)}
+        garnishBox={t(copy.hero.garnish.box, locale)}
+        handoffRef={handoffRef}
+        handoffLabel={t(copy.hero.handoff, locale)}
+      >
         <HeroBillboardCopy
           locale={locale}
-          garnishTop={t(copy.hero.garnish.top, locale)}
           stampText={t(copy.hero.stamp, locale)}
           receipt={t(copy.hero.receipt, locale)}
           devanagariAccent={copy.hero.devanagariAccent}
