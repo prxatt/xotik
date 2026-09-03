@@ -803,26 +803,29 @@ body {
 
 .hero-fizz-seal {
   position: absolute;
-  top: 42%;
-  left: 50%;
+  top: 14%;
+  left: 68%;
   z-index: 4;
   display: grid;
-  width: 0.88em;
-  height: 0.88em;
+  width: 0.62em;
+  height: 0.62em;
   margin: 0;
   place-items: center;
-  border: 0.045em solid var(--hero-accent);
+  border: 0.06em solid var(--hero-accent);
   border-radius: 999px;
   color: var(--hero-accent);
-  background: color-mix(in srgb, var(--hero-bg) 72%, transparent);
-  transform: translate(-48%, -52%) rotate(-12deg);
+  background: transparent;
+  mix-blend-mode: normal;
+  isolation: isolate;
+  filter: none;
+  transform: translate(12%, -36%) rotate(-16deg);
   text-align: center;
   pointer-events: none;
 }
 
 .hero-fizz-seal__line {
   font-family: var(--font-noto-devanagari), var(--font-bebas), sans-serif;
-  font-size: 0.16em;
+  font-size: 0.2em;
   font-weight: 700;
   line-height: 1.05;
   letter-spacing: 0.04em;
@@ -830,7 +833,7 @@ body {
 
 .hero-fizz-seal__line:last-child {
   font-family: var(--font-bebas), Impact, sans-serif;
-  font-size: 0.22em;
+  font-size: 0.26em;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
