@@ -1,8 +1,72 @@
 import Image from "next/image";
+import { type RefObject } from "react";
+import type gsap from "gsap";
 import { copy, t, tLines, type Locale } from "@/lib/copy";
+import { cloudinaryVideoUrl } from "@/lib/cloudinary";
+import { STREET_SCROLL_VIDEO_ID } from "@/lib/media";
 
 export const STREET_SEA = "/assets/hero/street-sea-link.jpg";
 export const STREET_MONSOON = "/assets/hero/street-monsoon-market.jpg";
+
+const STREET_VIDEO_SRC = cloudinaryVideoUrl(STREET_SCROLL_VIDEO_ID);
+
+/** Bind scroll-scrubbed playback to a GSAP timeline segment. */
+export function bindStreetVideoScrub(
+  video: HTMLVideoElement,
+  timeline: gsap.core.Timeline,
+  segmentDuration: number,
+  position = 0,
+) {
+  const scrub = () => {
+    const end = video.duration;
+    if (!Number.isFinite(end) || end <= 0) return;
+
+    timeline.to(
+      video,
+      { currentTime: end, ease: "none", duration: segmentDuration },
+      position,
+    );
+  };
+
+  if (video.readyState >= 1) scrub();
+  else video.addEventListener("loadedmetadata", scrub, { once: true });
+}
+
+export function waitForStreetMedia(container: HTMLElement): Promise<void> {
+  const images = Array.from(container.querySelectorAll("img"));
+  const videos = Array.from(container.querySelectorAll("video"));
+
+  const waits: Promise<void>[] = images.map(
+    (img) =>
+      new Promise<void>((resolve) => {
+        if (img.complete) resolve();
+        else {
+          img.addEventListener("load", () => resolve(), { once: true });
+          img.addEventListener("error", () => resolve(), { once: true });
+        }
+      }),
+  );
+
+  waits.push(
+    ...videos.map(
+      (video) =>
+        new Promise<void>((resolve) => {
+          if (video.readyState >= 1) resolve();
+          else {
+            video.addEventListener("loadedmetadata", () => resolve(), { once: true });
+            video.addEventListener("error", () => resolve(), { once: true });
+          }
+        }),
+    ),
+  );
+
+  if (waits.length === 0) return Promise.resolve();
+
+  return Promise.race([
+    Promise.all(waits).then(() => undefined),
+    new Promise<void>((resolve) => window.setTimeout(resolve, 1500)),
+  ]);
+}
 
 export function StreetOverlay() {
   return (
@@ -53,6 +117,27 @@ export function StreetSeaImage({ priority = false }: { priority?: boolean }) {
       priority={priority}
       className="object-cover object-center"
       sizes="100vw"
+    />
+  );
+}
+
+export function StreetSeaVideo({
+  videoRef,
+  priority = false,
+}: {
+  videoRef?: RefObject<HTMLVideoElement | null>;
+  priority?: boolean;
+}) {
+  return (
+    <video
+      ref={videoRef}
+      className="absolute inset-0 h-full w-full object-cover object-center"
+      src={STREET_VIDEO_SRC}
+      poster={STREET_SEA}
+      muted
+      playsInline
+      preload={priority ? "metadata" : "none"}
+      aria-hidden
     />
   );
 }

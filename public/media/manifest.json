@@ -1,0 +1,10 @@
+{
+  "street": {
+    "scrollVideo": {
+      "publicId": "xotik/media/street/chai-stall-monsoon-breeze",
+      "durationSeconds": 8,
+      "tiers": [1, 2],
+      "poster": "/assets/hero/street-sea-link.jpg"
+    }
+  }
+}
