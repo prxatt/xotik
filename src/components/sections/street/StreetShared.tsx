@@ -1,9 +1,12 @@
 import Image from "next/image";
 import { type RefObject } from "react";
-import type gsap from "gsap";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { copy, t, tLines, type Locale } from "@/lib/copy";
 import { cloudinaryVideoUrl } from "@/lib/cloudinary";
 import { STREET_SCROLL_VIDEO_ID } from "@/lib/media";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export const STREET_SEA = "/assets/hero/street-sea-link.jpg";
 export const STREET_MONSOON = "/assets/hero/street-monsoon-market.jpg";
@@ -11,6 +14,31 @@ export const STREET_MONSOON = "/assets/hero/street-monsoon-market.jpg";
 const STREET_VIDEO_SRC = cloudinaryVideoUrl(STREET_SCROLL_VIDEO_ID);
 
 /** Safari will not paint seeks on a never-played element — kick the decoder once. */
+function waitForSeek(video: HTMLVideoElement, time: number): Promise<void> {
+  return new Promise((resolve) => {
+    const closeEnough =
+      Math.abs(video.currentTime - time) < 0.04 &&
+      video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA;
+
+    if (closeEnough) {
+      resolve();
+      return;
+    }
+
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      video.removeEventListener("seeked", finish);
+      resolve();
+    };
+
+    video.addEventListener("seeked", finish, { once: true });
+    video.currentTime = time;
+    window.setTimeout(finish, 500);
+  });
+}
+
 function primeStreetVideo(video: HTMLVideoElement): Promise<void> {
   video.muted = true;
   video.playsInline = true;
@@ -21,7 +49,7 @@ function primeStreetVideo(video: HTMLVideoElement): Promise<void> {
     .catch(() => undefined)
     .then(() => {
       video.pause();
-      video.currentTime = 0;
+      return waitForSeek(video, 0);
     });
 }
 
@@ -62,6 +90,9 @@ export function bindStreetVideoScrub(
       },
       position,
     );
+
+    timeline.scrollTrigger?.update();
+    ScrollTrigger.refresh();
   };
 
   let attached = false;
