@@ -1,20 +1,62 @@
 import type { ReactNode } from "react";
 
+const RIBBON_REPEAT = 8;
+
 type HeroBillboardProps = {
   children: ReactNode;
   frameRef?: React.RefObject<HTMLDivElement | null>;
   sheetRef?: React.RefObject<HTMLDivElement | null>;
+  ribbonText?: string;
+  garnishTop?: string;
+  garnishBox?: string;
+  handoffRef?: React.RefObject<HTMLDivElement | null>;
+  handoffLabel?: string;
 };
 
 /**
- * Stamp-cut cobalt sheet on cream paper — matches the locked mobile mock.
+ * Desi-pop hero: stamp-cut on mobile, full-bleed billboard on desktop.
  */
-export function HeroBillboard({ children, frameRef, sheetRef }: HeroBillboardProps) {
+export function HeroBillboard({
+  children,
+  frameRef,
+  sheetRef,
+  ribbonText = "J BY JEERU · XOTIK FRUJUS · DESI POP · ",
+  garnishTop,
+  garnishBox,
+  handoffRef,
+  handoffLabel,
+}: HeroBillboardProps) {
+  const ribbonChunk = ribbonText.repeat(RIBBON_REPEAT);
+
   return (
     <div ref={frameRef} className="hero-paper">
       <div ref={sheetRef} className="hero-stamp-sheet">
+        <div className="hero-billboard__bg" aria-hidden />
+        <div className="hero-billboard__glow" aria-hidden />
         <div className="hero-stamp-sheet__grid" aria-hidden />
         <div className="hero-stamp-sheet__perforation" aria-hidden />
+
+        <div className="hero-billboard__ribbon hero-billboard__ribbon--a" aria-hidden>
+          <span>{ribbonChunk}</span>
+        </div>
+        <div className="hero-billboard__ribbon hero-billboard__ribbon--b" aria-hidden>
+          <span>{ribbonChunk}</span>
+        </div>
+
+        {garnishTop ? (
+          <p className="hero-garnish hero-garnish--tl">{garnishTop}</p>
+        ) : null}
+
+        {garnishBox ? (
+          <p className="hero-garnish hero-garnish--br hero-garnish-box">{garnishBox}</p>
+        ) : null}
+
+        {handoffLabel ? (
+          <div ref={handoffRef} className="hero-handoff font-condensed" aria-hidden>
+            {handoffLabel}
+          </div>
+        ) : null}
+
         <div className="hero-stamp-sheet__body">{children}</div>
       </div>
     </div>
@@ -27,7 +69,6 @@ type HeroBillboardCopyProps = {
   devanagariAccent: string;
   headlines: readonly string[];
   sub: string;
-  garnishTop?: string;
   stampText?: string;
   cta: ReactNode;
   typeLayerRef?: React.RefObject<HTMLDivElement | null>;
@@ -56,7 +97,6 @@ export function HeroBillboardCopy({
   devanagariAccent,
   headlines,
   sub,
-  garnishTop,
   stampText,
   cta,
   typeLayerRef,
@@ -70,57 +110,60 @@ export function HeroBillboardCopy({
   const fizzRows = stampText ? stampLines(stampText) : [];
 
   return (
-    <div ref={typeLayerRef} className="hero-copy">
-      {garnishTop ? <p className="hero-kicker">{garnishTop}</p> : null}
+    <div className="hero-copy-layout">
+      <div ref={typeLayerRef} className="hero-copy-layout__headline">
+        <p className="hero-receipt font-receipt">{receipt}</p>
 
-      <div className="hero-title-row">
-        <svg className="hero-swoosh" viewBox="0 0 900 220" preserveAspectRatio="none" aria-hidden>
-          <ellipse
-            cx="430"
-            cy="118"
-            rx="410"
-            ry="72"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="3.5"
-            transform="rotate(-9 430 118)"
-          />
-        </svg>
+        <div className="hero-title-row">
+          <svg className="hero-swoosh" viewBox="0 0 900 220" preserveAspectRatio="none" aria-hidden>
+            <ellipse
+              cx="430"
+              cy="118"
+              rx="410"
+              ry="72"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3.5"
+              transform="rotate(-9 430 118)"
+            />
+          </svg>
 
-        <h1 ref={headlineRef} className="hero-headline font-condensed">
-          {headlines.map((line) => (
-            <span key={line} className="hero-headline__line block">
-              {line}
-            </span>
-          ))}
-        </h1>
-
-        {stampText ? (
-          <div ref={stampRef} className="hero-fizz-seal" aria-hidden>
-            {fizzRows.map((row) => (
-              <span key={row} className="hero-fizz-seal__line">
-                {row}
+          <h1 ref={headlineRef} className="hero-headline font-condensed">
+            {headlines.map((line, index) => (
+              <span
+                key={line}
+                className={`hero-headline__line${
+                  index === headlines.length - 1 ? " hero-headline__line--accent" : ""
+                }`}
+              >
+                {line}
               </span>
             ))}
-          </div>
+          </h1>
+
+          {stampText ? (
+            <div ref={stampRef} className="hero-fizz-seal" aria-hidden>
+              {fizzRows.map((row) => (
+                <span key={row} className="hero-fizz-seal__line">
+                  {row}
+                </span>
+              ))}
+            </div>
+          ) : null}
+        </div>
+
+        {showDevanagariAccent ? (
+          <p className="hero-devanagari font-devanagari-display">{devanagariAccent}</p>
         ) : null}
       </div>
 
-      {showDevanagariAccent ? (
-        <p className="hero-devanagari font-devanagari-display">{devanagariAccent}</p>
-      ) : null}
-
-      <p className="hero-receipt-tape font-receipt">{receipt}</p>
-
-      <p ref={subRef} className="hero-sub font-receipt">
+      <p ref={subRef} className="hero-sub hero-copy-layout__sub font-receipt">
         {subRows.map((row) => (
-          <span key={row} className="block">
-            {row}
-          </span>
+          <span key={row}>{row}</span>
         ))}
       </p>
 
-      <div ref={ctaRef} className="hero-copy__cta">
+      <div ref={ctaRef} className="hero-copy-layout__cta">
         {cta}
       </div>
     </div>
