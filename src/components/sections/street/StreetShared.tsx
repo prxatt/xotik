@@ -10,6 +10,35 @@ export const STREET_MONSOON = "/assets/hero/street-monsoon-market.jpg";
 
 const STREET_VIDEO_SRC = cloudinaryVideoUrl(STREET_SCROLL_VIDEO_ID);
 
+/** Safari will not paint seeks on a never-played element — kick the decoder once. */
+function primeStreetVideo(video: HTMLVideoElement): Promise<void> {
+  video.muted = true;
+  video.playsInline = true;
+  video.preload = "auto";
+
+  return video
+    .play()
+    .catch(() => undefined)
+    .then(() => {
+      video.pause();
+      video.currentTime = 0;
+    });
+}
+
+function whenVideoCanScrub(video: HTMLVideoElement, onReady: () => void) {
+  if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA && video.duration > 0) {
+    onReady();
+    return;
+  }
+
+  const ready = () => {
+    if (video.duration > 0) onReady();
+  };
+
+  video.addEventListener("canplay", ready, { once: true });
+  video.addEventListener("loadedmetadata", ready, { once: true });
+}
+
 /** Bind scroll-scrubbed playback to a GSAP timeline segment. */
 export function bindStreetVideoScrub(
   video: HTMLVideoElement,
@@ -17,19 +46,44 @@ export function bindStreetVideoScrub(
   segmentDuration: number,
   position = 0,
 ) {
-  const scrub = () => {
+  const attach = () => {
     const end = video.duration;
     if (!Number.isFinite(end) || end <= 0) return;
 
-    timeline.to(
+    timeline.fromTo(
       video,
-      { currentTime: end, ease: "none", duration: segmentDuration },
+      { currentTime: 0 },
+      {
+        currentTime: end,
+        ease: "none",
+        duration: segmentDuration,
+        immediateRender: false,
+        invalidateOnRefresh: false,
+      },
       position,
     );
   };
 
-  if (video.readyState >= 1) scrub();
-  else video.addEventListener("loadedmetadata", scrub, { once: true });
+  let attached = false;
+  const attachOnce = () => {
+    if (attached) return;
+    attached = true;
+    attach();
+  };
+
+  void primeStreetVideo(video).then(() => whenVideoCanScrub(video, attachOnce));
+}
+
+function waitForVideoFrame(video: HTMLVideoElement): Promise<void> {
+  return new Promise((resolve) => {
+    if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+      resolve();
+      return;
+    }
+
+    video.addEventListener("canplay", () => resolve(), { once: true });
+    video.addEventListener("error", () => resolve(), { once: true });
+  });
 }
 
 export function waitForStreetMedia(container: HTMLElement): Promise<void> {
@@ -47,18 +101,7 @@ export function waitForStreetMedia(container: HTMLElement): Promise<void> {
       }),
   );
 
-  waits.push(
-    ...videos.map(
-      (video) =>
-        new Promise<void>((resolve) => {
-          if (video.readyState >= 1) resolve();
-          else {
-            video.addEventListener("loadedmetadata", () => resolve(), { once: true });
-            video.addEventListener("error", () => resolve(), { once: true });
-          }
-        }),
-    ),
-  );
+  waits.push(...videos.map((video) => waitForVideoFrame(video)));
 
   if (waits.length === 0) return Promise.resolve();
 
@@ -136,7 +179,7 @@ export function StreetSeaVideo({
       poster={STREET_SEA}
       muted
       playsInline
-      preload={priority ? "metadata" : "none"}
+      preload={priority ? "auto" : "metadata"}
       aria-hidden
     />
   );
