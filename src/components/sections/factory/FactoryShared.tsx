@@ -5,15 +5,15 @@ export function FactoryCopy({ locale }: { locale: Locale }) {
 
   return (
     <div className="relative z-10 mx-auto flex min-h-[100dvh] w-full max-w-[1280px] flex-col justify-end px-[var(--section-pad-x)] pb-16 pt-28 md:px-[var(--section-pad-x-desktop)] md:pb-24 md:pt-32">
-      <p className="font-receipt mb-4 text-[11px] tracking-[0.22em] text-hero-accent">02 — FACTORY</p>
-      <h2 className="font-condensed max-w-[14ch] text-[clamp(2.75rem,9vw,4.75rem)] leading-[0.88] tracking-wide text-hero-ink">
+      <p className="font-receipt mb-4 text-[11px] tracking-[0.22em] text-scene-accent">02 — FACTORY</p>
+      <h2 className="font-condensed max-w-[14ch] text-[clamp(2.75rem,9vw,4.75rem)] leading-[0.88] tracking-wide text-scene-surface">
         {lines.map((line) => (
           <span key={line} className="block">
             {line}
           </span>
         ))}
       </h2>
-      <p className="font-receipt mt-6 max-w-lg text-[11px] tracking-[0.14em] text-hero-ink/80 md:text-xs">
+      <p className="font-receipt mt-6 max-w-lg text-[11px] tracking-[0.14em] text-scene-surface/80 md:text-xs">
         {t(copy.factory.micro, locale)}
       </p>
     </div>
@@ -34,7 +34,7 @@ export function FactoryVisual({
 
   return (
     <div
-      className={`absolute inset-0 bg-gradient-to-br from-[#1a1a22] via-[#0f2da8] to-[#040011]${motionClass}`}
+      className={`absolute inset-0 bg-gradient-to-br from-[var(--scene-factory-bg)] via-[#3a424a] to-[var(--scene-factory-ink)]${motionClass}`}
       aria-hidden
     >
       <div

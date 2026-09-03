@@ -206,7 +206,12 @@ export function StreetFactoryScene({ locale, tier }: StreetFactorySceneProps) {
       style={{ height: `${config.totalVh}vh`, minHeight: `${config.totalVh}vh` }}
     >
       <div className="sticky top-0 h-[100dvh] min-h-[100dvh] overflow-hidden">
-        <DesiPopShell scene="street" chromeOnly className="desi-pop-shell--overlay pointer-events-none absolute inset-0 z-30" />
+        <DesiPopShell
+          scene="street"
+          chrome="overlay"
+          chromeOnly
+          className="pointer-events-none absolute inset-0 z-[5]"
+        />
 
         <div ref={factoryGroupRef} className="absolute inset-0 z-0 opacity-0" aria-hidden>
           <FactoryVisual variant={config.factoryVariant} />
