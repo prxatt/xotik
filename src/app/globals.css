@@ -987,66 +987,83 @@ body {
 
 /* ── Desi-pop custom cursor (tier 2 desktop) ── */
 html.desi-cursor-active,
-html.desi-cursor-active body {
-  cursor: none;
-}
-
-html.desi-cursor-active a,
-html.desi-cursor-active button {
-  cursor: none;
+html.desi-cursor-active *,
+html.desi-cursor-active *::before,
+html.desi-cursor-active *::after {
+  cursor: none !important;
 }
 
 .desi-cursor {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 9999;
-  width: 36px;
-  height: 36px;
+  z-index: 99999;
+  width: 0;
+  height: 0;
   pointer-events: none;
-  will-change: transform;
+  will-change: left, top;
+  translate: -50% -50%;
 }
 
 .desi-cursor__ring {
-  width: 100%;
-  height: 100%;
-  border: 2px solid var(--hero-accent);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+  border: 1.5px solid var(--hero-accent);
   border-radius: 50%;
   display: grid;
   place-items: center;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: inset 0 0 0 0 var(--hero-accent);
+  background: color-mix(in srgb, var(--hero-bg) 18%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--hero-ink) 12%, transparent),
+    0 0 18px color-mix(in srgb, var(--hero-accent) 22%, transparent);
   transform-origin: center center;
+  transition:
+    border-color 0.22s ease,
+    background-color 0.22s ease,
+    box-shadow 0.22s ease;
 }
 
 .desi-cursor__ring--hot {
   border-color: var(--hero-ink);
-  box-shadow: inset 0 0 0 14px color-mix(in srgb, var(--hero-accent) 35%, transparent);
+  background: color-mix(in srgb, var(--hero-accent) 16%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--hero-ink) 28%, transparent),
+    0 0 24px color-mix(in srgb, var(--hero-accent) 38%, transparent);
 }
 
-.desi-cursor__orbit {
-  position: absolute;
-  inset: 0;
-  animation: desi-cursor-spin 8s linear infinite;
+.desi-cursor__ring--press {
+  border-color: var(--hero-ink);
 }
 
-.desi-cursor__orbit-char {
+.desi-cursor__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--hero-ink);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--hero-ink) 55%, transparent);
+  transform-origin: center center;
+}
+
+.desi-cursor__label {
   position: absolute;
   left: 50%;
   top: 50%;
-  margin-left: -4px;
-  margin-top: -6px;
-  font-family: var(--font-bebas), Impact, sans-serif;
-  font-size: 8px;
-  letter-spacing: 0.05em;
+  transform: translateX(-50%);
+  margin-top: 0;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--hero-ink) 45%, transparent);
+  background: color-mix(in srgb, var(--hero-bg) 88%, transparent);
   color: var(--hero-ink);
-  transform-origin: 4px 24px;
-}
-
-@keyframes desi-cursor-spin {
-  to {
-    transform: rotate(360deg);
-  }
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* ── Product editorial (Jeeru-first) ── */
