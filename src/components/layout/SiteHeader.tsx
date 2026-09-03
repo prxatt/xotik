@@ -50,9 +50,11 @@ export function SiteHeader({
           </span>
         </Link>
 
-        <p className="site-header__chapter font-receipt hidden sm:block" aria-live="polite">
-          {chapterLabel.toUpperCase()}
-        </p>
+        {headerStyle !== "hero" ? (
+          <p className="site-header__chapter font-receipt hidden sm:block" aria-live="polite">
+            {chapterLabel.toUpperCase()}
+          </p>
+        ) : null}
 
         <div className="site-header__actions">
           <button
@@ -66,7 +68,7 @@ export function SiteHeader({
 
           <Link
             href="#product"
-            className="btn-pop site-header__cta hidden min-[420px]:inline-flex"
+            className="btn-pop site-header__cta hidden md:inline-flex"
             data-cursor-label="MEET J"
           >
             {t(copy.header.cta, locale)}
