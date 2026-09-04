@@ -9,9 +9,9 @@ import {
   ClampToEdgeWrapping,
   Color,
   Group,
+  InstancedBufferAttribute,
   InstancedMesh,
   Mesh,
-  MeshBasicMaterial,
   MeshStandardMaterial,
   Object3D,
   PCFSoftShadowMap,
@@ -20,11 +20,66 @@ import {
   SpotLight,
   SRGBColorSpace,
   TorusGeometry,
+  type BufferGeometry,
+  type Texture,
 } from "three";
 import { createSlimCanGeometry, createFullCanWrapGeometry } from "@/components/three/SlimCan";
 import { CAN_WRAP, createBrandLabelTexture, type CanLabelKind } from "@/components/three/createBrandLabelTexture";
 
 const BRAND_LOGO_SRC = "/assets/reference/brand/xotik-logo.png";
+
+/**
+ * Full-height wrap geometry with per-instance reveal (0–1).
+ * Fragment wipe shows top→bottom without Y-scale UV squash.
+ */
+function createWipeWrapGeometry(): BufferGeometry {
+  const g = createFullCanWrapGeometry();
+  g.setAttribute("aReveal", new InstancedBufferAttribute(new Float32Array(COUNT).fill(1), 1));
+  return g;
+}
+
+function createWipeWrapMaterial(map: Texture | null): MeshStandardMaterial {
+  const mat = new MeshStandardMaterial({
+    map: map ?? undefined,
+    metalness: 0.04,
+    roughness: 0.42,
+    envMapIntensity: 0.35,
+    transparent: false,
+    depthWrite: true,
+    toneMapped: true,
+  });
+  mat.onBeforeCompile = (shader) => {
+    shader.vertexShader = shader.vertexShader
+      .replace(
+        "#include <common>",
+        /* glsl */ `#include <common>
+attribute float aReveal;
+varying float vReveal;
+varying float vWrapV;`,
+      )
+      .replace(
+        "#include <uv_vertex>",
+        /* glsl */ `#include <uv_vertex>
+vReveal = aReveal;
+vWrapV = uv.y;`,
+      );
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        "#include <common>",
+        /* glsl */ `#include <common>
+varying float vReveal;
+varying float vWrapV;`,
+      )
+      .replace(
+        "#include <map_fragment>",
+        /* glsl */ `#include <map_fragment>
+// Top→bottom sleeve wipe — keep full UVs; discard unrevealed band.
+if (vWrapV < 1.0 - vReveal) discard;`,
+      );
+  };
+  mat.customProgramCacheKey = () => "factory-wrap-wipe-v1";
+  return mat;
+}
 
 /** Local image load — no Suspense / CDN, so factory labels paint even offline. */
 function useBrandLogoImage() {
@@ -249,12 +304,14 @@ const PACK_GATE_X = 7.75;
 /** Align / pad stop between belt rail and carton mouth. */
 const ALIGN_X = CARTON_X;
 const ALIGN_Z = 1.05;
-const ALIGN_DUR = 0.85;
-const ALIGN_HOLD = 0.28;
-const JUMP_DUR = 1.05;
-const CLOSE_DUR = 0.85;
-const TAPE_DUR = 0.7;
+const ALIGN_DUR = 0.7;
+const ALIGN_HOLD = 0.18;
+const JUMP_DUR = 0.82;
+const CLOSE_DUR = 0.75;
+const TAPE_DUR = 0.55;
 const SEALED_HOLD = 2.4;
+/** Flaps must be essentially shut before tape starts. */
+const TAPE_AFTER_CLOSE = 0.98;
 const PUSHER_IDLE_Z = 0.78;
 const BOX_FLOOR_Y = CARTON_BASE_Y + 0.02;
 const BOX_CAN_Y = BOX_FLOOR_Y + -CAN_BOTTOM_LOCAL;
@@ -277,10 +334,12 @@ function canFlavorKind(n: number): number {
   return n % 3;
 }
 
-/** Only every third sealed can diverts into the 3-pack carton. */
-function isPackCan(n: number): boolean {
-  return n % 3 === 0;
-}
+/**
+ * Carton fill rule — always a complete set:
+ * - mono: three of the same flavor
+ * - mixed: one of each flavor (never 2+1)
+ */
+type PackFillMode = "mono" | "mixed";
 
 /** Yaw so wrap art (local −X / u=0.5) faces the factory viewport. */
 function labelFaceYaw(x: number, z: number): number {
@@ -327,9 +386,9 @@ function pushSphereFromAabb(
   const qx = Math.min(s.x1, Math.max(s.x0, cx));
   const qy = Math.min(s.y1, Math.max(s.y0, cy));
   const qz = Math.min(s.z1, Math.max(s.z0, cz));
-  let dx = cx - qx;
-  let dy = cy - qy;
-  let dz = cz - qz;
+  const dx = cx - qx;
+  const dy = cy - qy;
+  const dz = cz - qz;
   const d2 = dx * dx + dy * dy + dz * dz;
   if (d2 >= r * r || d2 < 1e-10) return null;
   const d = Math.sqrt(d2);
@@ -602,26 +661,29 @@ function StampHead({
 }
 
 /**
- * Label applicator — arm-mounted wrist with clamp + wrap head.
- * Gates snap open on approach (wide), close onto the can, then the wrap head
- * orbits while the roller walks top→bottom to apply the sleeve procedurally.
- * Clamp stays parented to the arm/wrist — never floating mid-air.
+ * Label applicator — boom supports a wrap ring; pads live ON the ring only
+ * (no diameter bar through the can). Ring orbits 720° while riding top→bottom
+ * in sync with the procedural label reveal.
  */
 const LABEL_CLAMP_Y = CAN_Y + 0.02;
-const CLAMP_CLOSED_X = 0.36;
-const CLAMP_OPEN_X = 0.95;
-const CLAMP_EXIT_OPEN = 0.92;
-const CLAMP_CLOSE_LERP = 4.2;
-const CLAMP_SPIN_SPEED = 5.5;
+const CLAMP_CLOSED_X = 0.34;
+/** Wide travel so enter/exit reads clearly. */
+const CLAMP_OPEN_X = 1.22;
+const CLAMP_EXIT_OPEN = 1;
+/** Fast open + close — no sluggish lag. */
+const CLAMP_GATE_LERP = 14;
+/** Ring just outside the can body — pads mount on this torus. */
+const CLAMP_RING_R = CAN_WRAP.radius + 0.07;
+/** Two full turns while the wrap walks lid → foot. */
+const CLAMP_ORBIT_TURNS = 2;
 /** Outer face of closed entry pad — cans must clear this while gates are shut. */
-const CLAMP_GATE_PLANE = -(CLAMP_CLOSED_X - 0.04);
+const CLAMP_GATE_PLANE = -(CLAMP_CLOSED_X - 0.02);
 
 function LabelApplicatorClamp({
   dwellProgress,
   sealing,
   labeling,
   holding,
-  approach,
   gateOpen,
   labelApply,
 }: {
@@ -629,19 +691,22 @@ function LabelApplicatorClamp({
   sealing: MutableRefObject<boolean>;
   labeling: MutableRefObject<boolean>;
   holding: MutableRefObject<boolean>;
+  /** Reserved — bay approach still written by LineRig for future gate cueing. */
   approach: MutableRefObject<number>;
   /** 0–1 shared with LineRig for gate collision. */
   gateOpen: MutableRefObject<number>;
   /** 0–1 wrap apply (top→bottom) for the can in the bay. */
   labelApply: MutableRefObject<number>;
 }) {
+  const carriage = useRef<Group>(null);
   const spin = useRef<Group>(null);
+  const padA = useRef<Group>(null);
+  const padB = useRef<Group>(null);
   const roller = useRef<Group>(null);
   const jawEntry = useRef<Group>(null);
   const jawExit = useRef<Group>(null);
   const entryOpen = useRef(1);
   const exitOpen = useRef(1);
-  const spinAngle = useRef(0);
   const applySmooth = useRef(0);
 
   useFrame((_, delta) => {
@@ -649,94 +714,70 @@ function LabelApplicatorClamp({
     const active = sealing.current && labeling.current;
     const hold = holding.current;
     const d = dwellProgress.current;
-    const approaching = approach.current > 0.02;
 
     let entryTarget = 1;
     let exitTarget = 1;
     let applyTarget = 0;
-    let spinning = false;
 
     if (hold) {
       entryTarget = 0;
       exitTarget = CLAMP_EXIT_OPEN;
       applyTarget = 1;
-      spinning = false;
     } else if (active) {
-      // 0.00–0.18  gates fully open (can seats)
-      // 0.18–0.34  close onto can
-      // 0.34–0.78  wrap: spin + roller top→bottom (procedural label)
-      // 0.78–1.00  exit opens after apply
-      if (d < 0.18) {
+      // Short open seat → snappy close → wrap orbit → snappy exit open
+      if (d < 0.14) {
         entryTarget = 1;
         exitTarget = 1;
-        spinning = false;
-        applyTarget = 0;
-      } else if (d < 0.34) {
-        const close = 1 - smoothstep(0.18, 0.34, d);
+      } else if (d < 0.26) {
+        const close = 1 - smoothstep(0.14, 0.26, d);
         entryTarget = close;
         exitTarget = close;
-        spinning = false;
-        applyTarget = 0;
-      } else if (d < 0.78) {
+      } else if (d < 0.74) {
         entryTarget = 0;
         exitTarget = 0;
-        spinning = true;
-        applyTarget = smoothstep(0.34, 0.76, d);
+        applyTarget = smoothstep(0.28, 0.72, d);
       } else {
         entryTarget = 0;
-        exitTarget = CLAMP_EXIT_OPEN * smoothstep(0.78, 0.94, d);
-        spinning = false;
+        exitTarget = smoothstep(0.74, 0.86, d);
         applyTarget = 1;
       }
-    } else if (approaching) {
-      entryTarget = 1;
-      exitTarget = 1;
-      spinning = false;
-      applyTarget = 0;
     } else {
       entryTarget = 1;
       exitTarget = 1;
-      spinning = false;
-      applyTarget = 0;
     }
 
-    // Snap open (never late); ease closed so the bite still reads.
-    if (entryTarget >= entryOpen.current) entryOpen.current = entryTarget;
-    else entryOpen.current += (entryTarget - entryOpen.current) * Math.min(1, step * CLAMP_CLOSE_LERP);
-    if (exitTarget >= exitOpen.current) exitOpen.current = exitTarget;
-    else exitOpen.current += (exitTarget - exitOpen.current) * Math.min(1, step * CLAMP_CLOSE_LERP);
+    entryOpen.current += (entryTarget - entryOpen.current) * Math.min(1, step * CLAMP_GATE_LERP);
+    exitOpen.current += (exitTarget - exitOpen.current) * Math.min(1, step * CLAMP_GATE_LERP);
 
-    applySmooth.current += (applyTarget - applySmooth.current) * Math.min(1, step * 8);
-    labelApply.current = applySmooth.current;
+    applySmooth.current += (applyTarget - applySmooth.current) * Math.min(1, step * 10);
+    const apply = applySmooth.current;
+    labelApply.current = apply;
     gateOpen.current = Math.min(entryOpen.current, exitOpen.current);
-
-    if (spinning) {
-      spinAngle.current += step * CLAMP_SPIN_SPEED;
-    } else {
-      let a = ((spinAngle.current % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
-      if (a > Math.PI) a -= Math.PI * 2;
-      spinAngle.current -= a * Math.min(1, step * 5);
-      if (Math.abs(a) < 0.04) spinAngle.current = 0;
-    }
 
     const entryX = CLAMP_CLOSED_X + (CLAMP_OPEN_X - CLAMP_CLOSED_X) * entryOpen.current;
     const exitX = CLAMP_CLOSED_X + (CLAMP_OPEN_X - CLAMP_CLOSED_X) * exitOpen.current;
     if (jawEntry.current) jawEntry.current.position.x = -entryX;
     if (jawExit.current) jawExit.current.position.x = exitX;
-    if (spin.current) spin.current.rotation.y = spinAngle.current;
 
-    // Roller walks the can from lid → foot as the wrap applies.
-    if (roller.current) {
-      const topY = CAN_WRAP.height * 0.42;
-      const botY = -CAN_WRAP.height * 0.42;
-      roller.current.position.y = topY + (botY - topY) * applySmooth.current;
-      roller.current.rotation.x += step * (spinning ? 14 : 2);
-    }
+    // Carriage rides lid→foot; inner ring orbits exactly 720° with the reveal.
+    const topY = CAN_WRAP.height * 0.42;
+    const botY = -CAN_WRAP.height * 0.42;
+    const ringY = apply < 0.01 ? topY : topY + (botY - topY) * apply;
+    const orbit = apply * Math.PI * 2 * CLAMP_ORBIT_TURNS;
+    if (carriage.current) carriage.current.position.y = ringY;
+    if (spin.current) spin.current.rotation.y = orbit;
+    if (padA.current) padA.current.rotation.z = orbit * 1.2;
+    if (padB.current) padB.current.rotation.z = -orbit * 1.2;
+    if (roller.current) roller.current.rotation.x = orbit * 3;
   });
+
+  const padInset = 0.028;
+  const railZ = -(CLAMP_RING_R + 0.05);
+  const wrapHalf = CAN_WRAP.height * 0.55;
 
   return (
     <group position={[0, LABEL_CLAMP_Y, 0]}>
-      {/* Mast + slim boom from the back rail — supports the ring, no pedestal stack */}
+      {/* Mast + boom from the back rail — stays behind the can */}
       <mesh position={[0, 0.55, -0.88]} castShadow>
         <cylinderGeometry args={[0.05, 0.055, 1.15, 16]} />
         <meshStandardMaterial color="#2f363c" metalness={0.65} roughness={0.4} />
@@ -745,48 +786,98 @@ function LabelApplicatorClamp({
         <boxGeometry args={[0.22, 0.09, 0.22]} />
         <meshStandardMaterial color="#4a5258" metalness={0.7} roughness={0.32} />
       </mesh>
-      <mesh position={[0, 0.08, -0.48]} castShadow>
-        <boxGeometry args={[0.12, 0.08, 0.72]} />
+      <mesh position={[0, 0.06, -0.7]} castShadow>
+        <boxGeometry args={[0.14, 0.1, 0.4]} />
         <meshStandardMaterial color="#3a424a" metalness={0.7} roughness={0.35} />
       </mesh>
+      {/* Vertical slide rail behind the ring — no bar through the can */}
+      <mesh position={[0, 0, railZ]} castShadow>
+        <boxGeometry args={[0.055, wrapHalf * 2, 0.055]} />
+        <meshStandardMaterial color="#4a5258" metalness={0.75} roughness={0.3} />
+      </mesh>
 
-      {/* Clamp gates — parented to the boom assembly */}
+      {/* Side gates — short rear brackets; never cross the can axis */}
       <group ref={jawEntry} position={[-CLAMP_OPEN_X, 0, 0]}>
-        <mesh position={[0.08, 0, 0]} castShadow>
-          <boxGeometry args={[0.1, 0.42, 0.12]} />
+        <mesh position={[0.02, 0, -0.22]} castShadow>
+          <boxGeometry args={[0.06, 0.08, 0.36]} />
+          <meshStandardMaterial color="#3a424a" metalness={0.7} roughness={0.35} />
+        </mesh>
+        <mesh position={[0.05, 0, 0]} castShadow>
+          <boxGeometry args={[0.08, 0.36, 0.1]} />
           <meshStandardMaterial color="#5e676e" metalness={0.75} roughness={0.3} />
         </mesh>
-        <mesh position={[0.03, 0, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
-          <cylinderGeometry args={[0.22, 0.22, 0.07, 24, 1, false, 0, Math.PI]} />
+        <mesh position={[0.01, 0, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
+          <cylinderGeometry args={[0.18, 0.18, 0.06, 24, 1, false, 0, Math.PI]} />
           <meshStandardMaterial color="#c4a574" metalness={0.85} roughness={0.22} />
         </mesh>
       </group>
       <group ref={jawExit} position={[CLAMP_OPEN_X, 0, 0]}>
-        <mesh position={[-0.08, 0, 0]} castShadow>
-          <boxGeometry args={[0.1, 0.42, 0.12]} />
+        <mesh position={[-0.02, 0, -0.22]} castShadow>
+          <boxGeometry args={[0.06, 0.08, 0.36]} />
+          <meshStandardMaterial color="#3a424a" metalness={0.7} roughness={0.35} />
+        </mesh>
+        <mesh position={[-0.05, 0, 0]} castShadow>
+          <boxGeometry args={[0.08, 0.36, 0.1]} />
           <meshStandardMaterial color="#5e676e" metalness={0.75} roughness={0.3} />
         </mesh>
-        <mesh position={[-0.03, 0, 0]} rotation={[0, 0, -Math.PI / 2]} castShadow>
-          <cylinderGeometry args={[0.22, 0.22, 0.07, 24, 1, false, 0, Math.PI]} />
+        <mesh position={[-0.01, 0, 0]} rotation={[0, 0, -Math.PI / 2]} castShadow>
+          <cylinderGeometry args={[0.18, 0.18, 0.06, 24, 1, false, 0, Math.PI]} />
           <meshStandardMaterial color="#c4a574" metalness={0.85} roughness={0.22} />
         </mesh>
       </group>
 
-      {/* Rotating label applicator — the wrap animation to keep */}
-      <group ref={spin}>
-        <mesh rotation={[Math.PI / 2, 0, 0]}>
-          <torusGeometry args={[0.52, 0.018, 10, 48]} />
-          <meshStandardMaterial color="#6a737a" metalness={0.8} roughness={0.28} />
+      {/* Carriage slides on rear rail; pads/roller orbit on the ring */}
+      <group ref={carriage} position={[0, CAN_WRAP.height * 0.42, 0]}>
+        <mesh position={[0, 0, railZ]} castShadow>
+          <boxGeometry args={[0.1, 0.09, 0.1]} />
+          <meshStandardMaterial color="#5e676e" metalness={0.78} roughness={0.28} />
         </mesh>
-        <group ref={roller} position={[0.52, CAN_WRAP.height * 0.42, 0]}>
-          <mesh rotation={[0, 0, Math.PI / 2]} castShadow>
-            <cylinderGeometry args={[0.055, 0.055, 0.14, 20]} />
-            <meshStandardMaterial color="#e8c57a" metalness={0.55} roughness={0.35} />
+        <mesh position={[0, 0, (railZ - CLAMP_RING_R) * 0.5]} castShadow>
+          <boxGeometry args={[0.045, 0.045, Math.abs(railZ + CLAMP_RING_R)]} />
+          <meshStandardMaterial color="#3a424a" metalness={0.7} roughness={0.35} />
+        </mesh>
+
+        <group ref={spin}>
+          <mesh rotation={[Math.PI / 2, 0, 0]}>
+            <torusGeometry args={[CLAMP_RING_R, 0.016, 10, 56]} />
+            <meshStandardMaterial color="#6a737a" metalness={0.8} roughness={0.28} />
           </mesh>
-          <mesh position={[0.09, 0, 0]}>
-            <boxGeometry args={[0.08, 0.05, 0.05]} />
-            <meshStandardMaterial color="#4a5258" metalness={0.7} roughness={0.32} />
-          </mesh>
+
+          {/* Copper pad @ +X — mounted on ring only */}
+          <group ref={padA} position={[CLAMP_RING_R, 0, 0]}>
+            <mesh position={[-(padInset + 0.01), 0, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
+              <cylinderGeometry args={[0.07, 0.07, 0.045, 20]} />
+              <meshStandardMaterial color="#c4a574" metalness={0.85} roughness={0.22} />
+            </mesh>
+            <mesh position={[0.02, 0, 0]} castShadow>
+              <boxGeometry args={[0.05, 0.05, 0.05]} />
+              <meshStandardMaterial color="#5e676e" metalness={0.75} roughness={0.3} />
+            </mesh>
+          </group>
+
+          {/* Copper pad @ −X */}
+          <group ref={padB} position={[-CLAMP_RING_R, 0, 0]}>
+            <mesh position={[padInset + 0.01, 0, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
+              <cylinderGeometry args={[0.07, 0.07, 0.045, 20]} />
+              <meshStandardMaterial color="#c4a574" metalness={0.85} roughness={0.22} />
+            </mesh>
+            <mesh position={[-0.02, 0, 0]} castShadow>
+              <boxGeometry args={[0.05, 0.05, 0.05]} />
+              <meshStandardMaterial color="#5e676e" metalness={0.75} roughness={0.3} />
+            </mesh>
+          </group>
+
+          {/* Yellow roller @ +Z */}
+          <group ref={roller} position={[0, 0, CLAMP_RING_R]}>
+            <mesh rotation={[Math.PI / 2, 0, 0]} castShadow>
+              <cylinderGeometry args={[0.05, 0.05, 0.12, 20]} />
+              <meshStandardMaterial color="#e8c57a" metalness={0.55} roughness={0.35} />
+            </mesh>
+            <mesh position={[0, 0, 0.04]} castShadow>
+              <boxGeometry args={[0.045, 0.045, 0.04]} />
+              <meshStandardMaterial color="#4a5258" metalness={0.7} roughness={0.32} />
+            </mesh>
+          </group>
         </group>
       </group>
     </group>
@@ -927,7 +1018,7 @@ function PackGuideRails({ pusherZ }: { pusherZ: MutableRefObject<number> }) {
 
 /**
  * 3-pack kraft carton — one solid shell; brand as inset panels (no corner fight).
- * Auto-closes + tapes after 3 cans; scroll also drives close/tape.
+ * Flaps auto-close after 3 cans seat; tape only once flaps are shut.
  */
 function OpenCartonCase({
   brandMap,
@@ -954,7 +1045,8 @@ function OpenCartonCase({
     if (flapLeft.current) flapLeft.current.rotation.z = -1.05 * (1 - e);
     if (flapRight.current) flapRight.current.rotation.z = 1.05 * (1 - e);
 
-    const t = Math.min(1, Math.max(0, tapeProgress.current));
+    // Never show tape until flaps are closed.
+    const t = c >= TAPE_AFTER_CLOSE ? Math.min(1, Math.max(0, tapeProgress.current)) : 0;
     if (tape.current) {
       const span = smoothstep(0, 1, t);
       tape.current.scale.x = Math.max(0.02, span);
@@ -1372,6 +1464,12 @@ function LineRig({ rolling }: { rolling: boolean }) {
   const packRotX = useRef<number[]>(Array.from({ length: COUNT }, () => 0));
   const packSlot = useRef<number[]>(Array.from({ length: COUNT }, () => 0));
   const packCount = useRef(0);
+  /** Flavors already claimed for the open carton (in-flight + seated). */
+  const packClaimed = useRef<number[]>([]);
+  /** Alternates mono (3 same) ↔ mixed (one of each). */
+  const packFillMode = useRef<PackFillMode>("mono");
+  /** Target flavor when packing a mono carton. */
+  const packMonoFlavor = useRef(0);
   const autoClose = useRef(0);
   const autoTape = useRef(0);
   const sealedHold = useRef(0);
@@ -1388,8 +1486,8 @@ function LineRig({ rolling }: { rolling: boolean }) {
     g.rotateX(Math.PI / 2);
     return g;
   }, []);
-  // Full-body wrap — same art + fit as product showcase.
-  const labelGeo = useMemo(() => createFullCanWrapGeometry(), []);
+  // Full-body wrap — one geometry+reveal attr per flavor (shared attr would fight).
+  const labelGeos = useMemo(() => LABEL_KINDS.map(() => createWipeWrapGeometry()), []);
   const beltMap = useMemo(() => (typeof document === "undefined" ? null : createBeltTexture()), []);
   const rollerMap = useMemo(() => (typeof document === "undefined" ? null : createRollerTexture()), []);
   const CLEAT_COUNT = 40;
@@ -1404,6 +1502,10 @@ function LineRig({ rolling }: { rolling: boolean }) {
       return tex;
     });
   }, [logoImg]);
+  const labelMats = useMemo(
+    () => labelMaps.map((tex) => createWipeWrapMaterial(tex)),
+    [labelMaps],
+  );
   const cartonBrandMap = useMemo(() => createCartonBrandTexture(logoImg), [logoImg]);
   const tapeMap = useMemo(() => (typeof document === "undefined" ? null : createJeeruTapeTexture()), []);
   const rollingRef = useRef(rolling);
@@ -1459,7 +1561,7 @@ function LineRig({ rolling }: { rolling: boolean }) {
         }
       }
 
-      // Full wrap — procedural top→bottom during bay apply, then locked on.
+      // Full wrap — top→bottom wipe via aReveal (no Y-scale UV squash).
       const applying =
         sealing.current && pausedSlot.current === n && labelApply.current > 0.02;
       const reveal = stage >= 2 ? 1 : applying ? labelApply.current : 0;
@@ -1470,19 +1572,17 @@ function LineRig({ rolling }: { rolling: boolean }) {
           const i = labelCounts[kind]!;
           if (i < COUNT) {
             const faceY = labelFaceYaw(x, z);
-            const wrapH = CAN_WRAP.height;
-            const topLocal = CAN_WRAP.y + wrapH * 0.5;
-            const shownH = wrapH * reveal;
-            const centerLocal = topLocal - shownH * 0.5;
             dummy.position.set(
               x,
-              y + centerLocal * Math.cos(rotX),
-              z + centerLocal * Math.sin(rotX),
+              y + CAN_WRAP.y * Math.cos(rotX),
+              z + CAN_WRAP.y * Math.sin(rotX),
             );
             dummy.rotation.set(rotX, faceY, 0);
-            dummy.scale.set(1, reveal, 1);
+            dummy.scale.set(1, 1, 1);
             dummy.updateMatrix();
             sleeve.setMatrixAt(i, dummy.matrix);
+            const revealAttr = sleeve.geometry.getAttribute("aReveal") as InstancedBufferAttribute | undefined;
+            if (revealAttr) revealAttr.setX(i, reveal);
             labelCounts[kind] = i + 1;
           }
         }
@@ -1503,6 +1603,8 @@ function LineRig({ rolling }: { rolling: boolean }) {
       if (!sleeve) return;
       sleeve.count = labelCounts[kind] ?? 0;
       sleeve.instanceMatrix.needsUpdate = true;
+      const revealAttr = sleeve.geometry.getAttribute("aReveal") as InstancedBufferAttribute | undefined;
+      if (revealAttr) revealAttr.needsUpdate = true;
     });
 
     if (cleats.current) {
@@ -1524,12 +1626,15 @@ function LineRig({ rolling }: { rolling: boolean }) {
       beltMap?.dispose();
       rollerMap?.dispose();
       sealGeo.dispose();
-      labelGeo.dispose();
+      labelGeos.forEach((g) => g.dispose());
+      labelMats.forEach((m) => m.dispose());
       labelMaps.forEach((t) => t.dispose());
       cartonBrandMap.dispose();
       tapeMap?.dispose();
     };
-  }, [geometry, beltMap, rollerMap, sealGeo, labelGeo, labelMaps, cartonBrandMap, tapeMap]);
+    // writeInstances closes over latest refs; re-seed when label assets change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional asset-keyed init
+  }, [geometry, beltMap, rollerMap, sealGeo, labelGeos, labelMats, labelMaps, cartonBrandMap, tapeMap]);
 
   useFrame((_, delta) => {
     const step = Math.min(Math.max(delta, 0), 1 / 30);
@@ -1653,7 +1758,7 @@ function LineRig({ rolling }: { rolling: boolean }) {
       flash.current.intensity = Math.max(0, flash.current.intensity - step * 22);
     }
 
-    // Phase 5/6 — labeled cans into 3-pack; after 3, auto-close + J tape.
+    // Phase 5/6 — labeled cans into 3-pack; after 3, auto-close then tape.
     const beltMoving =
       rollingRef.current && pauseRemain.current <= 0 && clampHoldRemain.current <= 0;
     const host = typeof document !== "undefined" ? document.querySelector("[data-factory-stage]") : null;
@@ -1663,10 +1768,13 @@ function LineRig({ rolling }: { rolling: boolean }) {
       scrollClose = Number.isFinite(rawClose) ? Math.min(1, Math.max(0, rawClose)) : 0;
     }
 
-    if (packCount.current >= PACK_CAPACITY && autoClose.current < 1) {
+    // Keep flaps open until all 3 seats are filled — scroll must not seal early.
+    const boxFull = packCount.current >= PACK_CAPACITY;
+    if (boxFull && autoClose.current < 1) {
       autoClose.current = Math.min(1, autoClose.current + step / CLOSE_DUR);
     }
-    if (autoClose.current > 0.82 && autoTape.current < 1) {
+    // Tape only after flaps are fully closed.
+    if (autoClose.current >= TAPE_AFTER_CLOSE && autoTape.current < 1) {
       autoTape.current = Math.min(1, autoTape.current + step / TAPE_DUR);
     }
     if (autoTape.current >= 1) {
@@ -1686,16 +1794,32 @@ function LineRig({ rolling }: { rolling: boolean }) {
           lastX.current[n] = x;
         }
         packCount.current = 0;
+        packClaimed.current = [];
+        // Next carton: alternate mono ↔ mixed; advance mono flavor each mono cycle.
+        if (packFillMode.current === "mono") {
+          packFillMode.current = "mixed";
+        } else {
+          packFillMode.current = "mono";
+          packMonoFlavor.current = (packMonoFlavor.current + 1) % 3;
+        }
         autoClose.current = 0;
         autoTape.current = 0;
         sealedHold.current = 0;
       }
     }
 
-    cartonClose.current = Math.max(scrollClose, autoClose.current);
-    // Tape follows auto pack-out and scroll close (second half of scroll close beat).
-    const tapeFromScroll = scrollClose > 0.45 ? smoothstep(0.45, 1, scrollClose) : 0;
-    cartonTape.current = Math.max(autoTape.current, tapeFromScroll);
+    if (boxFull) {
+      cartonClose.current = Math.max(scrollClose, autoClose.current);
+      const tapeFromScroll =
+        scrollClose >= TAPE_AFTER_CLOSE ? smoothstep(TAPE_AFTER_CLOSE, 1, scrollClose) : 0;
+      const closeDone = cartonClose.current >= TAPE_AFTER_CLOSE;
+      cartonTape.current = closeDone ? Math.max(autoTape.current, tapeFromScroll) : 0;
+    } else {
+      cartonClose.current = 0;
+      cartonTape.current = 0;
+      autoClose.current = 0;
+      autoTape.current = 0;
+    }
 
     // Label clamp — every can; keep approach hot until seated.
     {
@@ -1718,15 +1842,21 @@ function LineRig({ rolling }: { rolling: boolean }) {
       clampApproach.current = approach;
     }
 
-    const closing = cartonClose.current > 0.15 || packCount.current >= PACK_CAPACITY;
+    // Only block new diverts once the box is full (never mid-fill from scroll).
+    const closing = boxFull;
     let packBusy = packPhase.current.some((p) => p === 1 || p === 2 || p === 3);
     const solids = buildPackSolids(pusherZ.current);
     const divertSolids = buildPackSolids(pusherZ.current, { includePad: false, includeFloor: false });
-    const aerialSolids = buildPackSolids(ALIGN_Z - 0.1, {
-      includePad: false,
-      includeFloor: false,
-      includeBeltWall: false,
-    });
+
+    const canJoinOpenPack = (n: number): boolean => {
+      if (packClaimed.current.length >= PACK_CAPACITY) return false;
+      const kind = canFlavorKind(n);
+      if (packFillMode.current === "mono") {
+        return kind === packMonoFlavor.current;
+      }
+      // Mixed: one of each — reject a flavor already claimed.
+      return !packClaimed.current.includes(kind);
+    };
 
     for (let n = 0; n < COUNT; n += 1) {
       let phase = packPhase.current[n] ?? 0;
@@ -1761,7 +1891,7 @@ function LineRig({ rolling }: { rolling: boolean }) {
             beltMoving &&
             !packBusy &&
             !closing &&
-            isPackCan(n) &&
+            canJoinOpenPack(n) &&
             (sealStage.current[n] ?? 0) >= 2 &&
             !packDone.current[n] &&
             packCount.current < PACK_CAPACITY &&
@@ -1771,7 +1901,8 @@ function LineRig({ rolling }: { rolling: boolean }) {
             packPhase.current[n] = 1;
             packT.current[n] = 0;
             packStartX.current[n] = x;
-            packSlot.current[n] = packCount.current;
+            packSlot.current[n] = packClaimed.current.length;
+            packClaimed.current.push(canFlavorKind(n));
             packBusy = true;
             phase = 1;
           } else {
@@ -1809,39 +1940,47 @@ function LineRig({ rolling }: { rolling: boolean }) {
           packT.current[n] = 0;
         }
       } else if (phase === 3) {
+        // Pure kinematic tumble from pad → box seats (no collision fighting the flip).
         packT.current[n] = (packT.current[n] ?? 0) + step;
         const u = Math.min(1, (packT.current[n] ?? 0) / JUMP_DUR);
-        const rotX = -Math.PI * 2 * smoothstep(0, 1, u);
         const slot = packSlot.current[n] ?? 0;
         const settleX = packSlotX(slot);
         const settleZ = CARTON_Z;
-        let desired: { x: number; y: number; z: number };
+        const peakY = BOX_RIM_Y + CAN_HALF_H + 0.28;
+        // Full forward flip into the carton — reads clearly off the shelf.
+        const rotX = -Math.PI * 2 * smoothstep(0, 0.92, u);
 
-        if (u < 0.28) {
-          const t = smoothstep(0, 1, u / 0.28);
+        let desired: { x: number; y: number; z: number };
+        if (u < 0.22) {
+          const t = smoothstep(0, 1, u / 0.22);
           desired = {
             x: ALIGN_X,
-            y: CAN_Y + (BOX_RIM_Y + CAN_HALF_H + 0.12 - CAN_Y) * t,
+            y: CAN_Y + (peakY - CAN_Y) * t,
             z: ALIGN_Z,
           };
-        } else if (u < 0.68) {
-          const t = smoothstep(0, 1, (u - 0.28) / 0.4);
+        } else if (u < 0.62) {
+          const t = smoothstep(0, 1, (u - 0.22) / 0.4);
+          const arc = Math.sin(t * Math.PI) * 0.08;
           desired = {
             x: ALIGN_X + (settleX - ALIGN_X) * t,
-            y: BOX_RIM_Y + CAN_HALF_H + 0.12,
+            y: peakY + arc,
             z: ALIGN_Z + (settleZ - ALIGN_Z) * t,
           };
         } else {
-          const t = smoothstep(0, 1, (u - 0.68) / 0.32);
+          const t = smoothstep(0, 1, (u - 0.62) / 0.38);
           desired = {
             x: settleX,
-            y: BOX_RIM_Y + CAN_HALF_H + 0.12 + (BOX_CAN_Y - (BOX_RIM_Y + CAN_HALF_H + 0.12)) * t,
+            y: peakY + (BOX_CAN_Y - peakY) * t,
             z: settleZ,
           };
         }
 
-        const useSolids = u < 0.72 ? aerialSolids : solids;
-        canPos.current[n] = resolveCanPose(desired.x, desired.y, desired.z, rotX, useSolids);
+        if (u < 0.88) {
+          canPos.current[n] = desired;
+        } else {
+          // Soft land against floor / walls only in the last beat.
+          canPos.current[n] = resolveCanPose(desired.x, desired.y, desired.z, rotX, solids);
+        }
         packRotX.current[n] = rotX;
 
         if (u >= 1) {
@@ -1983,21 +2122,10 @@ function LineRig({ rolling }: { rolling: boolean }) {
           ref={(node) => {
             labels.current[i] = node;
           }}
-          args={[labelGeo, undefined, COUNT]}
+          args={[labelGeos[i], labelMats[i], COUNT]}
           frustumCulled={false}
           castShadow
-        >
-          <meshStandardMaterial
-            map={labelMaps[i]}
-            metalness={0.04}
-            roughness={0.42}
-            envMapIntensity={0.35}
-            transparent={false}
-            opacity={1}
-            depthWrite
-            toneMapped
-          />
-        </instancedMesh>
+        />
       ))}
     </group>
   );
