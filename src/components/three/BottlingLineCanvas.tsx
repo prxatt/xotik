@@ -759,16 +759,31 @@ function LabelApplicatorClamp({
     if (jawEntry.current) jawEntry.current.position.x = -entryX;
     if (jawExit.current) jawExit.current.position.x = exitX;
 
-    // Carriage rides lid→foot; inner ring orbits exactly 720° with the reveal.
+    // Carriage rides lid→foot; orbit advances with apply only.
+    // When apply eases back to 0 after the can leaves, snap spin home
+    // (720° ≡ 0) and raise the carriage — never reverse-orbit.
     const topY = CAN_WRAP.height * 0.42;
     const botY = -CAN_WRAP.height * 0.42;
-    const ringY = apply < 0.01 ? topY : topY + (botY - topY) * apply;
-    const orbit = apply * Math.PI * 2 * CLAMP_ORBIT_TURNS;
-    if (carriage.current) carriage.current.position.y = ringY;
-    if (spin.current) spin.current.rotation.y = orbit;
-    if (padA.current) padA.current.rotation.z = orbit * 1.2;
-    if (padB.current) padB.current.rotation.z = -orbit * 1.2;
-    if (roller.current) roller.current.rotation.x = orbit * 3;
+    const wrapping = applyTarget > 0.02 || hold;
+
+    if (wrapping) {
+      const ringY = apply < 0.01 ? topY : topY + (botY - topY) * apply;
+      const orbit = apply * Math.PI * 2 * CLAMP_ORBIT_TURNS;
+      if (carriage.current) carriage.current.position.y = ringY;
+      if (spin.current) spin.current.rotation.y = orbit;
+      if (padA.current) padA.current.rotation.z = orbit * 1.2;
+      if (padB.current) padB.current.rotation.z = -orbit * 1.2;
+      if (roller.current) roller.current.rotation.x = orbit * 3;
+    } else {
+      if (spin.current) spin.current.rotation.y = 0;
+      if (padA.current) padA.current.rotation.z = 0;
+      if (padB.current) padB.current.rotation.z = 0;
+      if (roller.current) roller.current.rotation.x = 0;
+      if (carriage.current) {
+        carriage.current.position.y +=
+          (topY - carriage.current.position.y) * Math.min(1, step * 8);
+      }
+    }
   });
 
   const padInset = 0.028;
