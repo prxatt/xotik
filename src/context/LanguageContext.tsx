@@ -4,11 +4,12 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from "react";
-import type { Locale } from "@/lib/copy";
+import { DEFAULT_LOCALE, type Locale } from "@/lib/copy";
 
 type LanguageContextValue = {
   locale: Locale;
@@ -19,7 +20,7 @@ type LanguageContextValue = {
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>("en");
+  const [locale, setLocaleState] = useState<Locale>(DEFAULT_LOCALE);
 
   const setLocale = useCallback((next: Locale) => {
     setLocaleState(next);
@@ -28,6 +29,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const toggleLocale = useCallback(() => {
     setLocaleState((prev) => (prev === "en" ? "hinglish" : "en"));
   }, []);
+
+  useEffect(() => {
+    document.documentElement.lang = locale === "en" ? "en" : "hi";
+  }, [locale]);
 
   const value = useMemo(
     () => ({ locale, toggleLocale, setLocale }),

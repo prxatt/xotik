@@ -21,7 +21,7 @@ export function HeroStatic({ locale }: HeroStaticProps) {
           locale={locale}
           stampText={t(copy.hero.stamp, locale)}
           receipt={t(copy.hero.receipt, locale)}
-          devanagariAccent={copy.hero.devanagariAccent}
+          devanagariAccent={t(copy.hero.devanagariAccent, locale)}
           headlines={headlines}
           sub={t(copy.hero.sub, locale)}
           cta={

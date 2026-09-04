@@ -1,4 +1,4 @@
-import { copy, t, tLines, type Locale } from "@/lib/copy";
+import { copy, t, tLines, scriptDisplayClass, type Locale } from "@/lib/copy";
 
 const SWATCHES = [
   "var(--j-coral)",
@@ -44,7 +44,7 @@ export function ManifestoStaticPanel({ locale }: { locale: Locale }) {
             className={`manifesto-stop-card ${index % 2 === 0 ? "manifesto-stop-card--gold" : "manifesto-stop-card--red"}`}
           >
             <span className="manifesto-stop-card__label font-receipt">{t(stop.label, locale)}</span>
-            <h3 className="manifesto-stop-card__title font-condensed">{t(stop.title, locale)}</h3>
+            <h3 className={`manifesto-stop-card__title ${scriptDisplayClass(t(stop.title, locale))}`}>{t(stop.title, locale)}</h3>
             <p className="manifesto-stop-card__body font-receipt">{t(stop.body, locale)}</p>
           </article>
         ))}

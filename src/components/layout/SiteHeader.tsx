@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { copy, t } from "@/lib/copy";
+import { copy, t, chapterKicker } from "@/lib/copy";
 import { useLanguage } from "@/context/LanguageContext";
 import { useSceneHeaderStyle } from "@/hooks/useSceneHeaderStyle";
 import type { RefObject } from "react";
@@ -38,7 +38,7 @@ export function SiteHeader({
   const chapter = copy.chapters[activeChapter - 1];
   const chapterLabel = chapter
     ? `${String(activeChapter).padStart(2, "0")} — ${chapter.label[locale]}`
-    : "01 — Street";
+    : chapterKicker(0, locale);
 
   return (
     <header className={`site-header ${headerMod}`}>
@@ -52,7 +52,7 @@ export function SiteHeader({
 
         {headerStyle !== "hero" ? (
           <p className="site-header__chapter font-receipt hidden sm:block" aria-live="polite">
-            {chapterLabel.toUpperCase()}
+            {chapterLabel}
           </p>
         ) : null}
 
@@ -61,9 +61,9 @@ export function SiteHeader({
             type="button"
             onClick={toggleLocale}
             className="site-header__chip font-label"
-            aria-label={`Switch language. Current: ${locale}`}
+            aria-label={`Switch language. Current: ${locale === "en" ? "English" : "Hinglish"}`}
           >
-            {locale === "en" ? "EN / HI" : "HI / EN"}
+            {t(copy.header.toggle, locale)}
           </button>
 
           <Link

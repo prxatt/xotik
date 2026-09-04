@@ -6,6 +6,7 @@ import {
   Manrope,
   Noto_Sans_Devanagari,
 } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { AppProviders } from "@/components/providers/AppProviders";
 import { copy } from "@/lib/copy";
 import "./globals.css";
@@ -56,6 +57,7 @@ export default function RootLayout({
         className={`${bebasNeue.variable} ${fraunces.variable} ${manrope.variable} ${ibmPlexMono.variable} ${notoDevanagari.variable} antialiased`}
       >
         <AppProviders>{children}</AppProviders>
+        <Analytics />
       </body>
     </html>
   );

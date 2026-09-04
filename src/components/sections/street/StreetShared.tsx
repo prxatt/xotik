@@ -2,9 +2,13 @@ import Image from "next/image";
 import { type RefObject } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { copy, t, tLines, type Locale } from "@/lib/copy";
+import { copy, t, tLines, chapterKicker, type Locale } from "@/lib/copy";
 import { cloudinaryVideoUrl } from "@/lib/cloudinary";
-import { STREET_SCROLL_VIDEO_ID } from "@/lib/media";
+import {
+  STREET_SCROLL_FPS,
+  STREET_SCROLL_POSTER,
+  STREET_SCROLL_VIDEO_ID,
+} from "@/lib/media";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -67,42 +71,60 @@ function whenVideoCanScrub(video: HTMLVideoElement, onReady: () => void) {
   video.addEventListener("loadedmetadata", ready, { once: true });
 }
 
-/** Bind scroll-scrubbed playback to a GSAP timeline segment. */
+/** Smooth street motion: zoom is the scroll story. Seek only on fine pointers. */
 export function bindStreetVideoScrub(
   video: HTMLVideoElement,
-  timeline: gsap.core.Timeline,
-  segmentDuration: number,
-  position = 0,
+  trigger: HTMLElement,
+  progressEnd = 1,
 ) {
-  const attach = () => {
-    const end = video.duration;
-    if (!Number.isFinite(end) || end <= 0) return;
+  video.muted = true;
+  video.playsInline = true;
+  video.loop = true;
+  video.preload = "auto";
 
-    timeline.fromTo(
-      video,
-      { currentTime: 0 },
-      {
-        currentTime: end,
-        ease: "none",
-        duration: segmentDuration,
-        immediateRender: false,
-        invalidateOnRefresh: false,
-      },
-      position,
-    );
+  const coarse = window.matchMedia("(pointer: coarse)").matches;
+  if (coarse) {
+    void video.play().catch(() => undefined);
+    return;
+  }
 
-    timeline.scrollTrigger?.update();
-    ScrollTrigger.refresh();
+  let primed = false;
+  let duration = 0;
+  let lastProgress = 0;
+  let lastSeek = 0;
+
+  const seek = (progress: number) => {
+    if (!primed || duration <= 0) return;
+    const now = performance.now();
+    if (now - lastSeek < 48) return;
+    lastSeek = now;
+    const t = gsap.utils.clamp(0, 1, progress / progressEnd);
+    const next =
+      Math.round(t * Math.max(duration - 1 / STREET_SCROLL_FPS, 0) * STREET_SCROLL_FPS) /
+      STREET_SCROLL_FPS;
+    if (Math.abs(video.currentTime - next) < 0.08) return;
+    video.currentTime = next;
   };
 
-  let attached = false;
-  const attachOnce = () => {
-    if (attached) return;
-    attached = true;
-    attach();
-  };
+  ScrollTrigger.create({
+    trigger,
+    start: "top top",
+    end: "bottom bottom",
+    scrub: true,
+    onUpdate(self) {
+      lastProgress = self.progress;
+      seek(self.progress);
+    },
+  });
 
-  void primeStreetVideo(video).then(() => whenVideoCanScrub(video, attachOnce));
+  void primeStreetVideo(video).then(() => {
+    whenVideoCanScrub(video, () => {
+      if (!Number.isFinite(video.duration) || video.duration <= 0) return;
+      duration = video.duration;
+      primed = true;
+      seek(lastProgress);
+    });
+  });
 }
 
 function waitForVideoFrame(video: HTMLVideoElement): Promise<void> {
@@ -145,19 +167,8 @@ export function waitForStreetMedia(container: HTMLElement): Promise<void> {
 export function StreetOverlay() {
   return (
     <>
-      <div
-        className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#040011]/88 via-[#0f2da8]/45 to-[#1a47eb]/25"
-        aria-hidden
-      />
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.12] mix-blend-soft-light"
-        style={{
-          backgroundImage:
-            "linear-gradient(color-mix(in srgb, #ffe94a 18%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, #ffe94a 18%, transparent) 1px, transparent 1px)",
-          backgroundSize: "28px 28px",
-        }}
-        aria-hidden
-      />
+      <div className="street-billboard__wash" aria-hidden />
+      <div className="street-billboard__grid" aria-hidden />
     </>
   );
 }
@@ -166,16 +177,23 @@ export function StreetCopy({ locale }: { locale: Locale }) {
   const lines = tLines(copy.street.headline, locale);
 
   return (
-    <div className="relative z-10 mx-auto w-full max-w-[1280px] px-[var(--section-pad-x)] pb-16 pt-28 md:px-[var(--section-pad-x-desktop)] md:pb-24 md:pt-32">
-      <p className="font-receipt mb-4 text-[11px] tracking-[0.22em] text-hero-accent">01 — STREET</p>
-      <h2 className="font-condensed max-w-[12ch] text-[clamp(2.75rem,10vw,5.25rem)] leading-[0.88] tracking-wide text-hero-ink">
-        {lines.map((line) => (
-          <span key={line} className="block">
-            {line}
-          </span>
-        ))}
+    <div className="street-copy street-copy-layout">
+      <p className="street-receipt font-receipt">{chapterKicker(0, locale)}</p>
+      <h2 className="street-headline font-condensed">
+        {lines.map((line, index) => {
+          const accentLast = index === lines.length - 1 && lines.length > 1;
+          return (
+            <span
+              key={line}
+              className={`street-headline__line${accentLast ? " street-headline__line--accent" : ""}`}
+            >
+              {line}
+            </span>
+          );
+        })}
       </h2>
-      <p className="font-receipt mt-8 text-[10px] tracking-[0.2em] text-hero-ink/75">
+      <p className="street-copy__note font-receipt">{t(copy.street.note, locale)}</p>
+      <p className="font-receipt mt-6 text-[10px] tracking-[0.22em] text-[#fff3d4]/70">
         {t(copy.street.scroll, locale)}
       </p>
     </div>
@@ -205,12 +223,13 @@ export function StreetSeaVideo({
   return (
     <video
       ref={videoRef}
-      className="absolute inset-0 h-full w-full object-cover object-center"
+      className="absolute inset-0 h-full w-full"
       src={STREET_VIDEO_SRC}
-      poster={STREET_SEA}
+      poster={STREET_SCROLL_POSTER}
       muted
       playsInline
       preload={priority ? "auto" : "metadata"}
+      disablePictureInPicture
       aria-hidden
     />
   );

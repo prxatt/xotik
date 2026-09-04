@@ -34,8 +34,8 @@ export function ManifestoSection({ locale }: { locale: Locale }) {
   }
 
   return (
-    <div id="manifesto" aria-label="Brand attitude">
-      <ManifestoPathScene locale={locale} tier={2} />
-    </div>
+      <div id="manifesto" aria-label="Brand attitude">
+        <ManifestoPathScene locale={locale} tier={2} />
+      </div>
   );
 }

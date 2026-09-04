@@ -68,7 +68,7 @@ export function IngredientsSection({ locale }: { locale: Locale }) {
       id="ingredients"
       scene="taste"
       aria-label="J by Jeeru taste"
-      className="relative overflow-hidden text-scene-ink"
+      className="relative overflow-hidden text-scene-ink chapter-defer"
       tier0={<IngredientsPanel locale={locale} animated={false} />}
       tier1={<IngredientsPanel locale={locale} animated />}
       tier2={<IngredientsPanel locale={locale} animated />}

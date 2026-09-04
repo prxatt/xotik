@@ -35,10 +35,16 @@ export function HeroBillboard({
         <div className="hero-stamp-sheet__perforation" aria-hidden />
 
         <div className="hero-billboard__ribbon hero-billboard__ribbon--a" aria-hidden>
-          <span>{ribbonChunk}</span>
+          <div className="hero-billboard__ribbon-track">
+            <span>{ribbonChunk}</span>
+            <span>{ribbonChunk}</span>
+          </div>
         </div>
         <div className="hero-billboard__ribbon hero-billboard__ribbon--b" aria-hidden>
-          <span>{ribbonChunk}</span>
+          <div className="hero-billboard__ribbon-track">
+            <span>{ribbonChunk}</span>
+            <span>{ribbonChunk}</span>
+          </div>
         </div>
 
         {garnishTop ? (
@@ -124,7 +130,7 @@ export function HeroBillboardCopy({
   ctaRef,
   stampRef,
 }: HeroBillboardCopyProps) {
-  const showDevanagariAccent = locale === "en";
+  const showDevanagariAccent = locale === "en" && Boolean(devanagariAccent);
   const subRows = splitHeroSub(sub);
   const fizzRows = stampText ? stampLines(stampText) : [];
   const fizzLine = stampText ? stampLineIndex(headlines) : -1;
@@ -148,24 +154,18 @@ export function HeroBillboardCopy({
             />
           </svg>
 
-          <h1 ref={headlineRef} className="hero-headline font-condensed">
+          <h1
+            ref={headlineRef}
+            className={`hero-headline${locale === "hinglish" ? " hero-headline--deva font-devanagari-display" : " font-condensed"}`}
+          >
             {headlines.map((line, index) => {
-              const isLast = index === headlines.length - 1;
-              const lineClass = `hero-headline__line${isLast ? " hero-headline__line--accent" : ""}`;
-              const seal =
-                index === fizzLine ? (
-                  <span ref={stampRef} className="hero-fizz-seal" aria-hidden>
-                    {fizzRows.map((row) => (
-                      <span key={row} className="hero-fizz-seal__line">
-                        {row}
-                      </span>
-                    ))}
-                  </span>
-                ) : null;
+              const accentLast = headlines.length > 1 && index === headlines.length - 1;
+              const lineClass = `hero-headline__line${accentLast ? " hero-headline__line--accent" : ""}`;
+              const showSeal = index === fizzLine && fizzRows.length > 0;
 
-              if (!seal) {
+              if (!showSeal) {
                 return (
-                  <span key={line} className={lineClass}>
+                  <span key={`${index}-${line}`} className={lineClass}>
                     {line}
                   </span>
                 );
@@ -175,11 +175,17 @@ export function HeroBillboardCopy({
               const anchor = stampAnchorIndex(line);
 
               return (
-                <span key={line} className={lineClass}>
+                <span key={`${index}-${line}`} className={lineClass}>
                   {chars.slice(0, anchor).join("")}
                   <span className="hero-headline__mark">
                     {chars[anchor]}
-                    {seal}
+                    <span ref={stampRef} className="hero-fizz-seal" aria-hidden>
+                      {fizzRows.map((row) => (
+                        <span key={row} className="hero-fizz-seal__line">
+                          {row}
+                        </span>
+                      ))}
+                    </span>
                   </span>
                   {chars.slice(anchor + 1).join("")}
                 </span>

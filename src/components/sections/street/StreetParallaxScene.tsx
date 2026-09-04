@@ -107,7 +107,7 @@ export function StreetParallaxScene({ locale, tier }: StreetParallaxSceneProps) 
 
         const streetVideo = streetVideoRef.current;
         if (streetVideo) {
-          bindStreetVideoScrub(streetVideo, tl, 1, 0);
+          bindStreetVideoScrub(streetVideo, root, 1);
         }
       }, root);
 
