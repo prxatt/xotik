@@ -1,7 +1,6 @@
 import type { Locale } from "@/lib/copy";
 import {
   StreetCopy,
-  StreetMonsoonImage,
   StreetOverlay,
   StreetSeaImage,
 } from "@/components/sections/street/StreetShared";
@@ -11,36 +10,21 @@ export function StreetStatic({ locale }: { locale: Locale }) {
     <section
       id="street"
       aria-label="Indian street scene"
-      className="scene-shell relative min-h-[100dvh]"
-      data-scene="street"
+      className="relative min-h-[100dvh]"
     >
-      <div className="absolute inset-0">
-        <StreetSeaImage priority />
+      <div className="street-billboard absolute inset-0">
+        <div className="street-billboard__stage">
+          <StreetSeaImage priority />
+        </div>
         <StreetOverlay />
+        <div className="relative z-20">
+          <StreetCopy locale={locale} />
+        </div>
       </div>
-      <StreetCopy locale={locale} />
     </section>
   );
 }
 
 export function StreetStaticLayered({ locale }: { locale: Locale }) {
-  return (
-    <section
-      id="street"
-      aria-label="Indian street scene"
-      className="scene-shell relative min-h-[100dvh]"
-      data-scene="street"
-    >
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 scale-105">
-          <StreetSeaImage priority />
-        </div>
-        <div className="absolute inset-0 scale-110 opacity-40 mix-blend-multiply">
-          <StreetMonsoonImage />
-        </div>
-        <StreetOverlay />
-      </div>
-      <StreetCopy locale={locale} />
-    </section>
-  );
+  return <StreetStatic locale={locale} />;
 }

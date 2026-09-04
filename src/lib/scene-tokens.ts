@@ -36,7 +36,7 @@ export const sceneTokens = {
     bg: "var(--scene-product-bg)",
     surface: "var(--scene-product-surface)",
     ink: "var(--scene-product-ink)",
-    accent: "var(--j-coral)",
+    accent: "var(--scene-product-accent)",
     label: "J",
   },
   taste: {

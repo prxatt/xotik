@@ -65,10 +65,22 @@ For xotik street art (not SF ferry hero):
 
 ## Next code hooks in xotik
 
-- `StreetFactoryScene.tsx` — swap `FactoryVisual` placeholder for factory MP4
-- `ProductSection.tsx` — optional `<Canvas>` when `tier === 2` and GLB exists
+- `StreetFactoryScene.tsx` — street MP4 scrub (Phase 2a: 1:1 `currentTime`, native 1280w). Factory is a real-can belt until a factory MP4 exists — do not add a fake video entry.
+- `public/models/j-bottle-draco.glb` — Khronos WaterBottle, Draco + WebP (~81 KB). CDN: `xotik/models/j-bottle-draco.glb` on Cloudinary.
+- `BottlingLineCanvas` — real WebGL bottling line (cloned bottles, empty bay, steel belt).
+- `JourneyCan` — same GLB travels the scroll, always behind copy.
 - `public/media/manifest.json` — declare which clips exist per tier (avoid half-baked loads)
 
+## Phase 2a (in progress)
+
+Done in product: street seek no longer GSAP-tweens `currentTime`; delivery stays at source 1280×720; monsoon overlay is lighter so the clip can read; factory gradient placeholder replaced with a Jeeru conveyor; product chapter pins the can.
+
+Still later: factory MP4, image-to-3D GLB, 4DGS splat.
+
 ## Honesty rule
+
+This Phase 2 doc is **later media**. The active product is the **J by Jeeru standalone presentation** — see `docs/PLAN-J-BY-JEERU.md`.
+
+Until Blender / new plates land: use existing Xotik drink stills as placeholders. Do not invent fake factory MP4s or store maps. The full xotik.co.in rebrand is a separate project that will include J; it is not this presentation’s scope.
 
 Do not ship placeholder gradients when a manifest entry promises video/3D/splat. Tier fallback must downgrade to stills automatically.

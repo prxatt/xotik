@@ -36,12 +36,17 @@ export function HeroKineticScene({ locale, tier }: HeroKineticSceneProps) {
     if (reducedMotion) return;
 
     const ctx = gsap.context(() => {
+      const typeLayer = typeLayerRef.current;
+      const headline = headlineRef.current;
+      const sub = subRef.current;
+      const cta = ctaRef.current;
+
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: root,
           start: "top top",
-          end: () => `+=${Math.round(window.innerHeight * 0.28)}`,
-          scrub: true,
+          end: () => `+=${Math.round(window.innerHeight * 0.12)}`,
+          scrub: 0.35,
           pin,
           pinSpacing: true,
           anticipatePin: 1,
@@ -52,20 +57,29 @@ export function HeroKineticScene({ locale, tier }: HeroKineticSceneProps) {
 
       tl.fromTo(
         sheet,
-        { y: 0, opacity: 1 },
-        { y: -8, opacity: 1, ease: "none", duration: 0.7 },
+        { y: 0, scale: 1 },
+        { y: -18, scale: 0.985, ease: "none", duration: 1 },
         0,
       );
 
-      if (handoff) {
-        gsap.set(handoff, { opacity: 0, y: 20 });
-        tl.to(handoff, { opacity: 1, y: 0, ease: "none", duration: 0.18 }, 0.52);
-        tl.to(handoff, { opacity: 0, y: -12, ease: "none", duration: 0.12 }, 0.82);
+      if (typeLayer) {
+        tl.fromTo(
+          typeLayer,
+          { y: 0 },
+          { y: -12, ease: "none", duration: 1 },
+          0,
+        );
       }
 
-      tl.to(sheet, { opacity: 0, ease: "none", duration: 0.3 }, 0.7);
+      if (headline && sub && cta) {
+        tl.to([headline, sub, cta], { opacity: 0.94, ease: "none", duration: 1 }, 0);
+      }
 
-      ScrollTrigger.refresh();
+      if (handoff) {
+        gsap.set(handoff, { opacity: 0, y: 16 });
+        tl.to(handoff, { opacity: 1, y: 0, ease: "none", duration: 0.35 }, 0.45);
+        tl.to(handoff, { opacity: 0.85, ease: "none", duration: 0.2 }, 0.85);
+      }
     }, root);
 
     return () => ctx.revert();
@@ -86,7 +100,7 @@ export function HeroKineticScene({ locale, tier }: HeroKineticSceneProps) {
           locale={locale}
           stampText={t(copy.hero.stamp, locale)}
           receipt={t(copy.hero.receipt, locale)}
-          devanagariAccent={copy.hero.devanagariAccent}
+          devanagariAccent={t(copy.hero.devanagariAccent, locale)}
           headlines={headlines}
           sub={t(copy.hero.sub, locale)}
           typeLayerRef={typeLayerRef}

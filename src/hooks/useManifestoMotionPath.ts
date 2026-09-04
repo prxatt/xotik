@@ -65,6 +65,8 @@ export function useManifestoMotionPath(
 
         if (!initMarker || stops.length === 0 || !pathEnd) return;
 
+        const mobile = window.innerWidth < 768;
+
         const psRect = pathSection!.getBoundingClientRect();
         const imRect = initMarker.getBoundingClientRect();
 
@@ -76,14 +78,20 @@ export function useManifestoMotionPath(
         });
 
         const travelerRect = traveler!.getBoundingClientRect();
-        const points: Point[] = stops.map((stop) => {
+        const points: Point[] = [];
+        stops.forEach((stop, index) => {
           const marker = stop.querySelector<HTMLElement>(".manifesto-marker");
-          if (!marker) return { x: 0, y: 0 };
+          if (!marker) return;
           const r = marker.getBoundingClientRect();
-          return {
+          const dest = {
             x: r.left - travelerRect.left,
             y: r.top - travelerRect.top,
           };
+          if (mobile) {
+            const bulge = (index % 2 === 0 ? 1 : -1) * Math.min(window.innerWidth * 0.32, 120);
+            points.push({ x: dest.x + bulge, y: dest.y - 36 });
+          }
+          points.push(dest);
         });
 
         drawTrace(svg!, pathSection!, travelerRect, stops, scrub);
@@ -102,7 +110,7 @@ export function useManifestoMotionPath(
           ease: "none",
           motionPath: {
             path: points,
-            curviness: 1.5,
+            curviness: mobile ? 2.2 : 1.5,
           },
         });
       }, pathSection!);

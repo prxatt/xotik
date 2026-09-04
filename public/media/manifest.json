@@ -3,8 +3,19 @@
     "scrollVideo": {
       "publicId": "xotik/media/street/chai-stall-monsoon-breeze",
       "durationSeconds": 8,
+      "fps": 24,
       "tiers": [1, 2],
       "poster": "/assets/hero/street-sea-link.jpg"
+    }
+  },
+  "models": {
+    "bottle": {
+      "publicId": "xotik/models/j-bottle-draco.glb",
+      "version": "1788421663",
+      "bytes": 81064,
+      "draco": true,
+      "source": "Khronos glTF Sample Assets — WaterBottle (Apache 2.0)",
+      "tiers": [1, 2]
     }
   }
 }

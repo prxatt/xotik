@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRef } from "react";
-import { copy, t, tLines, type Locale } from "@/lib/copy";
+import { copy, t, tLines, scriptDisplayClass, type Locale } from "@/lib/copy";
 import {
   useManifestoMotionPath,
   useManifestoOathScroll,
@@ -32,7 +32,7 @@ function ManifestoStopCard({
     >
       <article className={`manifesto-stop-card ${index % 2 === 0 ? "manifesto-stop-card--gold" : "manifesto-stop-card--red"}`}>
         <span className="manifesto-stop-card__label font-receipt">{t(stop.label, locale)}</span>
-        <h2 className="manifesto-stop-card__title font-condensed">{t(stop.title, locale)}</h2>
+        <h2 className={`manifesto-stop-card__title ${scriptDisplayClass(t(stop.title, locale))}`}>{t(stop.title, locale)}</h2>
         <p className="manifesto-stop-card__body font-receipt">{t(stop.body, locale)}</p>
         <div className="manifesto-marker" aria-hidden />
       </article>
@@ -124,7 +124,7 @@ export function ManifestoPathScene({ locale, tier }: ManifestoPathSceneProps) {
 
       <section ref={oathRef} className="manifesto-oath-clip scene-shell" data-scene="manifesto">
         <span className="font-receipt manifesto-oath-clip__title">
-          ✦ {t(copy.manifesto.intro, locale)} — HOVER EACH LINE ✦
+          ✦ {t(copy.manifesto.intro, locale)} — {t(copy.manifesto.hoverHint, locale)} ✦
         </span>
         {copy.manifesto.oath.map((line, index) => (
           <h4 key={line.main.en} className="manifesto-oath-line font-condensed">

@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRef } from "react";
 import { SectionFallback } from "@/components/fallback/SectionFallback";
 import { useCapabilityTierContext } from "@/context/CapabilityTierContext";
@@ -24,27 +23,27 @@ function CtaPanel({ locale, animated }: { locale: Locale; animated: boolean }) {
       className="section-panel mx-auto w-full max-w-[1280px] px-[var(--section-pad-x)] py-24 text-center md:px-[var(--section-pad-x-desktop)] md:py-32"
     >
       <p className="font-receipt mb-4 text-[11px] tracking-[0.2em] text-scene-accent">
-        06 · Find · Xotik Frujus
+        {t(copy.cta.kicker, locale)}
       </p>
-      <h2 className="section-kinetic-line font-condensed text-[clamp(2.5rem,10vw,5rem)] leading-[0.88] text-scene-ink">
+      <h2 className="section-kinetic-line relative z-10 font-condensed text-[clamp(2.5rem,10vw,5rem)] leading-[0.88] text-scene-ink">
         {t(copy.cta.primary, locale)}
       </h2>
 
       <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-        <Link
-          href="#stores"
+        <a
+          href={`mailto:${copy.footer.email}`}
           className="btn-pop btn-pop--hero"
           data-cursor-label="FIND J"
         >
           {t(copy.cta.primary, locale)}
-        </Link>
-        <Link
-          href="/tokens"
+        </a>
+        <a
+          href={`tel:${copy.footer.phone.replace(/\s/g, "")}`}
           className="cta-secondary font-receipt"
-          data-cursor-label="STORY"
+          data-cursor-label="CALL"
         >
-          {t(copy.cta.secondary, locale)}
-        </Link>
+          {copy.footer.phone}
+        </a>
       </div>
 
       <div
@@ -53,7 +52,7 @@ function CtaPanel({ locale, animated }: { locale: Locale; animated: boolean }) {
         data-cursor-label="EMAIL"
       >
         <p className="font-receipt mb-2 text-[10px] tracking-[0.16em] text-scene-accent">
-          Store locator
+          {t(copy.cta.locator, locale)}
         </p>
         <p className="font-receipt text-sm tracking-[0.06em] text-scene-ink/80">{t(copy.cta.stores, locale)}</p>
         <a

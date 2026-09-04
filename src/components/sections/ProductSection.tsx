@@ -1,87 +1,126 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useRef } from "react";
+import { useMemo, useState, type CSSProperties } from "react";
 import { SectionFallback } from "@/components/fallback/SectionFallback";
 import { useCapabilityTierContext } from "@/context/CapabilityTierContext";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
-import { useSectionReveal } from "@/hooks/useSectionReveal";
-import { copy, t, tLines, type Locale } from "@/lib/copy";
+import { copy, t, type Locale } from "@/lib/copy";
+import { drinkById } from "@/lib/media";
+import type { CanLabelKind } from "@/components/three/createBrandLabelTexture";
 
-const JEERU_CAN = {
-  src: "/assets/products/xotik-jeeru-can.jpg",
-  alt: "J by Jeeru Masala slim can",
-};
+const ProductLineCanvas = dynamic(
+  () => import("@/components/three/ProductLineCanvas").then((m) => m.ProductLineCanvas),
+  { ssr: false },
+);
 
-function ProductPanel({ locale, animated }: { locale: Locale; animated: boolean }) {
-  const rootRef = useRef<HTMLDivElement>(null);
-  const visualRef = useRef<HTMLDivElement>(null);
-  const { tier } = useCapabilityTierContext();
+const PRODUCT_LINE = copy.product.variants;
+
+type FlavorId = (typeof PRODUCT_LINE)[number]["id"];
+
+function isFlavorId(id: string): id is FlavorId {
+  return PRODUCT_LINE.some((v) => v.id === id);
+}
+
+function ProductPanel({
+  locale,
+  show3d,
+}: {
+  locale: Locale;
+  show3d: boolean;
+}) {
   const prefersReducedMotion = usePrefersReducedMotion();
-  const body = tLines(copy.product.body, locale);
-
-  useSectionReveal(rootRef, {
-    enabled: animated && !prefersReducedMotion && tier > 0,
-    mediaRef: visualRef,
-    progress: false,
-    lineSelector: ".section-kinetic-line",
-  });
+  const [activeId, setActiveId] = useState<FlavorId>("jeeru");
+  const active = useMemo(
+    () => PRODUCT_LINE.find((v) => v.id === activeId) ?? PRODUCT_LINE[0]!,
+    [activeId],
+  );
+  const photo = drinkById(activeId);
+  const billboard = t(active.billboard, locale);
+  const nameParts = billboard.trim().split(/\s+/);
+  const chars = Math.max(...nameParts.map((p) => p.length), 5);
 
   return (
-    <div
-      ref={rootRef}
-      className="product-editorial mx-auto flex min-h-[min(100dvh,920px)] w-full max-w-[1280px] flex-col justify-center px-[var(--section-pad-x)] py-20 md:px-[var(--section-pad-x-desktop)] md:py-24"
-    >
-      <div className="product-editorial__grid">
-        <div className="product-editorial__copy">
-          <p className="font-receipt mb-4 text-[11px] tracking-[0.2em] text-scene-surface/90">
-            03 · {t(copy.product.eyebrow, locale)}
-          </p>
-          <h2 className="font-condensed section-kinetic-line text-[clamp(3rem,12vw,6.5rem)] leading-[0.86] text-scene-surface">
-            {t(copy.product.headline, locale)}
-          </h2>
-          <p className="font-body section-kinetic-line mt-5 max-w-md text-base text-scene-surface/90 md:text-lg">
-            {t(copy.product.lead, locale)}
-          </p>
-          <div className="font-condensed mt-6 space-y-1 text-xl tracking-wide text-scene-surface md:text-2xl">
-            {body.map((line) => (
-              <p key={line} className="section-kinetic-line">
-                {line}
-              </p>
-            ))}
-          </div>
-          <p className="font-receipt mt-8 inline-block rounded-full border border-scene-surface/40 px-4 py-2 text-[10px] tracking-[0.18em] text-scene-surface">
-            {t(copy.product.flagship, locale)}
-          </p>
-        </div>
+    <div className="product-billboard" data-flavor={activeId}>
+      <p
+        className="font-condensed product-billboard__name"
+        aria-hidden
+        style={{ "--chars": chars } as CSSProperties}
+        key={activeId}
+      >
+        {nameParts.length > 1 ? (
+          nameParts.map((part) => (
+            <span key={part} className="product-billboard__name-line">
+              {part}
+            </span>
+          ))
+        ) : (
+          billboard
+        )}
+      </p>
 
-        <div ref={visualRef} className="product-editorial__visual" data-cursor-label="JEERU">
-          <div className="product-editorial__frame">
+      <h2 className="sr-only">{t(active.label, locale)}</h2>
+
+      <div className="product-billboard__stage" data-cursor-label={billboard}>
+        {show3d ? (
+          <ProductLineCanvas
+            kind={activeId as CanLabelKind}
+            reducedMotion={prefersReducedMotion}
+          />
+        ) : (
+          <div className="product-billboard__photo">
             <Image
-              src={JEERU_CAN.src}
-              alt={JEERU_CAN.alt}
+              key={photo.id}
+              src={photo.src}
+              alt={photo.alt}
               width={640}
               height={960}
-              className="product-editorial__img"
-              priority
+              className="product-billboard__photo-img"
+              priority={photo.id === "jeeru"}
             />
           </div>
-        </div>
+        )}
       </div>
+
+      <nav className="product-billboard__line" aria-label={t(copy.product.lineLabel, locale)}>
+        {PRODUCT_LINE.map((item) => {
+          const selected = item.id === activeId;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              className={`product-billboard__sku product-billboard__sku--${item.id}${selected ? " is-active" : ""}`}
+              aria-pressed={selected}
+              data-cursor-label={t(item.label, locale).toUpperCase()}
+              onClick={() => {
+                if (isFlavorId(item.id)) setActiveId(item.id);
+              }}
+            >
+              <span className="font-condensed product-billboard__sku-name">
+                {t(item.label, locale)}
+              </span>
+              <span className="font-receipt product-billboard__sku-tag">{t(item.tag, locale)}</span>
+            </button>
+          );
+        })}
+      </nav>
     </div>
   );
 }
 
 export function ProductSection({ locale }: { locale: Locale }) {
+  const { tier } = useCapabilityTierContext();
+
   return (
     <SectionFallback
       id="product"
       scene="product"
-      aria-label="J by Jeeru product"
-      className="relative overflow-hidden text-scene-ink"
-      tier0={<ProductPanel locale={locale} animated={false} />}
-      tier1={<ProductPanel locale={locale} animated />}
-      tier2={<ProductPanel locale={locale} animated />}
+      aria-label="J by Jeeru product line"
+      className="relative product-scene"
+      tier0={<ProductPanel locale={locale} show3d={false} />}
+      tier1={<ProductPanel locale={locale} show3d={tier >= 1} />}
+      tier2={<ProductPanel locale={locale} show3d />}
     />
   );
 }

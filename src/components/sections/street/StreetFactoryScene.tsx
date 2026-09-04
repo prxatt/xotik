@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import type { Locale } from "@/lib/copy";
+import { copy, t, type Locale } from "@/lib/copy";
 import {
   FactoryCopy,
   FactoryVisual,
@@ -11,7 +11,6 @@ import {
 import { DesiPopShell } from "@/components/layout/DesiPopShell";
 import {
   StreetCopy,
-  StreetMonsoonImage,
   StreetOverlay,
   StreetSeaVideo,
   bindStreetVideoScrub,
@@ -25,35 +24,37 @@ type StreetFactorySceneProps = {
   tier: 1 | 2;
 };
 
-/** Normalized timeline length — hold after crossfade keeps factory visible before unpin. */
+/** Normalized timeline length — hold + line-pan after crossfade. */
 const TIMELINE_END = 1;
 
 const SCENE = {
-  1: {
-    totalVh: 260,
-    parallaxEnd: 0.52,
-    crossfadeStart: 0.52,
-    crossfadeComplete: 0.68,
-    bgInset: "18%",
-    fgInset: "22%",
-    bgY: { from: -2, to: 7 },
-    fgY: { from: -4, to: 11 },
-    streetCopyY: -4,
-    scrub: 1,
-    factoryVariant: "motion" as const,
-  },
   2: {
-    totalVh: 340,
-    parallaxEnd: 0.55,
-    crossfadeStart: 0.55,
-    crossfadeComplete: 0.7,
-    bgInset: "20%",
-    fgInset: "26%",
-    bgY: { from: -3, to: 10 },
-    fgY: { from: -5, to: 14 },
+    /** Extra height: settle at bay, then travel the line to the carton. */
+    totalVh: 400,
+    parallaxEnd: 0.4,
+    crossfadeStart: 0.4,
+    crossfadeComplete: 0.52,
+    /** Clear hold after crossfade so the line doesn’t jump backward on entry. */
+    linePanStart: 0.7,
+    linePanEnd: 0.88,
+    bgInset: "0%",
+    fgInset: "6%",
     streetCopyY: -8,
-    scrub: 0.65,
+    scrub: 0.15,
     factoryVariant: "3d" as const,
+  },
+  1: {
+    totalVh: 300,
+    parallaxEnd: 0.46,
+    crossfadeStart: 0.46,
+    crossfadeComplete: 0.6,
+    linePanStart: 0.72,
+    linePanEnd: 0.88,
+    bgInset: "0%",
+    fgInset: "4%",
+    streetCopyY: -6,
+    scrub: 0.2,
+    factoryVariant: "motion" as const,
   },
 } as const;
 
@@ -67,7 +68,6 @@ export function StreetFactoryScene({ locale, tier }: StreetFactorySceneProps) {
   const rootRef = useRef<HTMLElement>(null);
   const streetGroupRef = useRef<HTMLDivElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
-  const fgRef = useRef<HTMLDivElement>(null);
   const streetVideoRef = useRef<HTMLVideoElement>(null);
   const streetCopyRef = useRef<HTMLDivElement>(null);
   const factoryGroupRef = useRef<HTMLDivElement>(null);
@@ -79,12 +79,11 @@ export function StreetFactoryScene({ locale, tier }: StreetFactorySceneProps) {
     const root = rootRef.current;
     const streetGroup = streetGroupRef.current;
     const bg = bgRef.current;
-    const fg = fgRef.current;
     const streetCopy = streetCopyRef.current;
     const factoryGroup = factoryGroupRef.current;
     const factoryCopy = factoryCopyRef.current;
 
-    if (!root || !streetGroup || !bg || !fg || !streetCopy || !factoryGroup || !factoryCopy) {
+    if (!root || !streetGroup || !bg || !streetCopy || !factoryGroup || !factoryCopy) {
       return;
     }
 
@@ -93,6 +92,19 @@ export function StreetFactoryScene({ locale, tier }: StreetFactorySceneProps) {
 
     let ctx: gsap.Context | null = null;
     let cancelled = false;
+
+    const setLinePan = (progress: number) => {
+      const span = scene.linePanEnd - scene.linePanStart;
+      const raw = span > 0 ? (progress - scene.linePanStart) / span : 0;
+      const pan = Math.min(1, Math.max(0, raw));
+      factoryGroup.dataset.linePan = pan.toFixed(4);
+      factoryGroup.style.setProperty("--line-pan", String(pan));
+      // After line travel finishes, close the carton before the next section.
+      const closeSpan = Math.max(0.001, 1 - scene.linePanEnd);
+      const closeRaw = (progress - scene.linePanEnd) / closeSpan;
+      const cartonClose = Math.min(1, Math.max(0, closeRaw));
+      factoryGroup.dataset.cartonClose = cartonClose.toFixed(4);
+    };
 
     ctx = gsap.context(() => {
       const crossfadeDuration = scene.crossfadeComplete - scene.crossfadeStart;
@@ -104,20 +116,17 @@ export function StreetFactoryScene({ locale, tier }: StreetFactorySceneProps) {
           end: "bottom bottom",
           scrub: scene.scrub,
           invalidateOnRefresh: true,
+          onUpdate(self) {
+            factoryGroup.toggleAttribute("data-on", self.progress >= scene.crossfadeStart - 0.06);
+            setLinePan(self.progress);
+          },
         },
       });
 
       tl.fromTo(
         bg,
-        { yPercent: scene.bgY.from },
-        { yPercent: scene.bgY.to, ease: "none", duration: scene.parallaxEnd },
-        0,
-      );
-
-      tl.fromTo(
-        fg,
-        { yPercent: scene.fgY.from },
-        { yPercent: scene.fgY.to, ease: "none", duration: scene.parallaxEnd },
+        { scale: 1.62, transformOrigin: "22% 82%" },
+        { scale: 1, ease: "none", duration: scene.parallaxEnd },
         0,
       );
 
@@ -135,14 +144,14 @@ export function StreetFactoryScene({ locale, tier }: StreetFactorySceneProps) {
 
       const streetVideo = streetVideoRef.current;
       if (streetVideo) {
-        bindStreetVideoScrub(streetVideo, tl, scene.parallaxEnd, 0);
+        bindStreetVideoScrub(streetVideo, root, scene.parallaxEnd);
       }
 
       tl.to(
         streetGroup,
         {
+          yPercent: -8,
           opacity: 0,
-          filter: "blur(6px)",
           ease: "none",
           duration: crossfadeDuration,
         },
@@ -167,6 +176,14 @@ export function StreetFactoryScene({ locale, tier }: StreetFactorySceneProps) {
         scene.crossfadeStart + crossfadeDuration * 0.2,
       );
 
+      // Soften copy while traveling the line so the carton station reads.
+      const panDur = scene.linePanEnd - scene.linePanStart;
+      tl.to(
+        factoryCopy,
+        { opacity: 0.22, y: 28, ease: "none", duration: panDur * 0.85 },
+        scene.linePanStart,
+      );
+
       tl.to(
         {},
         { duration: TIMELINE_END - scene.crossfadeComplete, ease: "none" },
@@ -189,8 +206,9 @@ export function StreetFactoryScene({ locale, tier }: StreetFactorySceneProps) {
       ref={rootRef}
       id="street"
       aria-label="Street to factory transition"
-      className="relative"
+      className="relative z-[2]"
       style={{ height: `${config.totalVh}vh`, minHeight: `${config.totalVh}vh` }}
+      data-line-travel
     >
       <div className="sticky top-0 h-[100dvh] min-h-[100dvh] overflow-hidden">
         <DesiPopShell
@@ -200,44 +218,25 @@ export function StreetFactoryScene({ locale, tier }: StreetFactorySceneProps) {
           className="pointer-events-none absolute inset-0 z-[5]"
         />
 
-        <div ref={factoryGroupRef} className="absolute inset-0 z-0 opacity-0" aria-hidden>
+        <div
+          ref={factoryGroupRef}
+          data-factory-stage
+          data-line-pan="0"
+          data-carton-close="0"
+          className="absolute inset-0 z-0 h-[100dvh] w-full min-h-[100dvh] opacity-0"
+          aria-hidden
+        >
           <FactoryVisual variant={config.factoryVariant} />
         </div>
 
-        <div ref={streetGroupRef} className="absolute inset-0 z-10">
-          <div
-            ref={bgRef}
-            className="absolute will-change-transform"
-            style={{
-              top: `-${config.bgInset}`,
-              right: `-${config.bgInset}`,
-              bottom: `-${config.bgInset}`,
-              left: `-${config.bgInset}`,
-            }}
-            aria-hidden
-          >
+        <div ref={streetGroupRef} className="street-billboard absolute inset-0 z-10">
+          <div ref={bgRef} className="street-billboard__stage will-change-transform" aria-hidden>
             <StreetSeaVideo videoRef={streetVideoRef} priority />
-          </div>
-
-          <div
-            ref={fgRef}
-            className={`absolute will-change-transform mix-blend-multiply ${
-              tier === 2 ? "opacity-35" : "opacity-40"
-            }`}
-            style={{
-              top: `-${config.fgInset}`,
-              right: `-${config.fgInset}`,
-              bottom: `-${config.fgInset}`,
-              left: `-${config.fgInset}`,
-            }}
-            aria-hidden
-          >
-            <StreetMonsoonImage priority />
           </div>
 
           <StreetOverlay />
 
-          <div ref={streetCopyRef} className="relative z-10 will-change-transform">
+          <div ref={streetCopyRef} className="relative z-20 will-change-transform">
             <StreetCopy locale={locale} />
           </div>
         </div>
@@ -250,8 +249,8 @@ export function StreetFactoryScene({ locale, tier }: StreetFactorySceneProps) {
         </div>
 
         {tier === 2 && (
-          <p className="font-receipt absolute bottom-4 right-4 z-30 rounded-full border border-hero-ink/30 bg-[#040011]/70 px-3 py-1 text-[9px] tracking-[0.14em] text-hero-ink">
-            STREET → FACTORY
+          <p className="font-receipt absolute bottom-4 right-4 z-30 rounded-full border border-[var(--factory-mikan)]/55 bg-[var(--factory-nasu)]/80 px-3 py-1 text-[9px] tracking-[0.14em] text-[var(--factory-wakatake)]">
+            {t(copy.street.factoryHandoff, locale)}
           </p>
         )}
       </div>

@@ -9,7 +9,7 @@ export type DesiPopScene =
   | "manifesto"
   | "cta";
 
-export type DesiPopChrome = "full" | "light" | "overlay";
+export type DesiPopChrome = "full" | "light" | "overlay" | "none";
 
 type DesiPopShellProps = {
   scene: DesiPopScene;
@@ -37,8 +37,9 @@ export function DesiPopShell({
   const ribbonChunk = ribbonText.repeat(6);
   const showRibbons = chrome === "full";
   const showGrid = chrome === "full";
+  const showChrome = chrome !== "none";
 
-  const chromeLayers = (
+  const chromeLayers = showChrome ? (
     <>
       {showGrid && <div className="desi-pop-shell__bg" aria-hidden />}
       <div className="desi-pop-shell__glow" aria-hidden />
@@ -57,7 +58,7 @@ export function DesiPopShell({
         </>
       )}
     </>
-  );
+  ) : null;
 
   if (chromeOnly) {
     return (

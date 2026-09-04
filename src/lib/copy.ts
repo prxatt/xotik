@@ -1,4 +1,20 @@
+/**
+ * Locale copy — single source for EN vs HI.
+ *
+ * EN (default): clean English. Hindi/Hinglish only as tiny accents.
+ *   Keep Pocket-Sized Pride. Keep जेब में J under the hero stack.
+ *   Brand words stay: Jeera, J, fizz, masala. Gully is the one street loanword.
+ *
+ * HI: same layout as EN. Swap key phrases — not a full rewrite.
+ *   Hero poster is जेब में J. Chapter labels are Devanagari.
+ *
+ * Stamp पूरा FIZZ is identical in both modes.
+ * Toggle stays EN / HI (HI = Hinglish, not pure Hindi).
+ */
+
 export type Locale = "en" | "hinglish";
+
+export const DEFAULT_LOCALE: Locale = "en";
 
 export const copy = {
   meta: {
@@ -12,22 +28,24 @@ export const copy = {
     cta: { en: "Meet J", hinglish: "Mil J" },
     menu: { en: "Menu", hinglish: "Menu" },
     language: { en: "EN", hinglish: "HI" },
+    toggle: { en: "EN / HI", hinglish: "HI / EN" },
   },
   chapters: [
-    { id: "street", label: { en: "Street", hinglish: "Gully" } },
-    { id: "factory", label: { en: "Factory", hinglish: "Factory" } },
+    { id: "street", label: { en: "Street", hinglish: "गली" } },
+    { id: "factory", label: { en: "Factory", hinglish: "फैक्टरी" } },
     { id: "product", label: { en: "J", hinglish: "J" } },
-    { id: "ingredients", label: { en: "Taste", hinglish: "Taste" } },
-    { id: "manifesto", label: { en: "Attitude", hinglish: "Swag" } },
-    { id: "find-j", label: { en: "Find", hinglish: "Find" } },
+    { id: "ingredients", label: { en: "Taste", hinglish: "स्वाद" } },
+    { id: "manifesto", label: { en: "Attitude", hinglish: "अंदाज़" } },
+    { id: "find-j", label: { en: "Find", hinglish: "खोज" } },
   ],
   hero: {
-    devanagariAccent: "जेब में J",
+    /** EN-only wink under the English stack. Empty in HI — the headline is already Devanagari. */
+    devanagariAccent: { en: "जेब में J", hinglish: "" },
     headline: {
-      en: ["POCKET-SIZED", "PRIDE."],
-      hinglish: ["जेब में J.", "FULL scene."],
+      en: ["POCKET-", "SIZED", "PRIDE."],
+      hinglish: ["जेब में J"],
     },
-    receipt: { en: "01 · J · Xotik Frujus", hinglish: "01 · J · Poora scene" },
+    receipt: { en: "01 · J · Xotik Frujus", hinglish: "01 · J · Xotik Frujus" },
     ribbon: "J BY JEERU · XOTIK FRUJUS · DESI POP · ",
     garnish: {
       top: {
@@ -49,23 +67,24 @@ export const copy = {
   },
   street: {
     headline: {
-      en: ["GULLY CRICKET", "KE BAAD.", "FULL FLAVOUR."],
-      hinglish: [
-        "Gully cricket ke baad,",
-        "cycle ride ke baad,",
-        "bas J chahiye.",
-      ],
+      en: ["AFTER GULLY", "CRICKET.", "AFTER THE RIDE.", "FULL FLAVOUR."],
+      hinglish: ["GULLY CRICKET", "KE BAAD.", "RIDE KE BAAD.", "FULL FLAVOUR."],
     },
-    scroll: { en: "Scroll ↓", hinglish: "Neeche ↓" },
+    scroll: { en: "Keep scrolling", hinglish: "Aage badho" },
+    note: {
+      en: "The match ends. J opens.",
+      hinglish: "Match khatam. J khulo.",
+    },
+    factoryHandoff: { en: "SCROLL ALONG THE LINE", hinglish: "LINE KE SAATH SCROLL" },
   },
   factory: {
     headline: {
-      en: ["BIG TASTE.", "MODERN LINE."],
-      hinglish: ["Bada swaad.", "Nayi machine."],
+      en: ["BIG TASTE.", "ONE OPEN BAY."],
+      hinglish: ["Bada swaad.", "Ek khali jagah."],
     },
     micro: {
-      en: "Warm batch · Strict QC · Built to travel",
-      hinglish: "Garam batch · Saf quality · Door tak ready",
+      en: "Warm batch. Sealed. One empty bay — then Meet J.",
+      hinglish: "Garam batch. Seal band. Ek khali jagah — phir Mil J.",
     },
   },
   ingredients: {
@@ -91,8 +110,8 @@ export const copy = {
         id: "apple",
         name: { en: "Apple", hinglish: "Seb" },
         note: { en: "Fruit base", hinglish: "Fruit ka base" },
-        bg: "#2d5be3",
-        ink: "#ffe94a",
+        bg: "#e8f0d4",
+        ink: "#2a4414",
       },
       {
         id: "spice",
@@ -105,27 +124,32 @@ export const copy = {
         id: "fizz",
         name: { en: "Fizz", hinglish: "Fizz" },
         note: { en: "Full scene", hinglish: "Poora scene" },
-        bg: "#ff2d95",
-        ink: "#040011",
+        bg: "#1e4d6b",
+        ink: "#add794",
       },
     ],
   },
   product: {
-    eyebrow: { en: "J BY JEERU", hinglish: "J BY JEERU" },
-    headline: { en: "MEET J.", hinglish: "MIL J." },
-    lead: {
-      en: "The masala fizz everyone already knows — now pocket-sized.",
-      hinglish: "Wohi masala fizz jo sab jaante hain — ab jeb ke size mein.",
-    },
-    body: {
-      en: ["FIZZY.", "MASALA.", "VERY J."],
-      hinglish: ["FULL FIZZ.", "MASALA KICK.", "BOHOT J."],
-    },
-    flagship: { en: "JEERU MASALA · FLAGSHIP CAN", hinglish: "JEERU MASALA · ASLI HERO" },
+    lineLabel: { en: "The J line", hinglish: "J ki line" },
     variants: [
-      { id: "jeeru", label: { en: "Jeeru Masala", hinglish: "Jeeru Masala" } },
-      { id: "cola", label: { en: "Xotik Cola", hinglish: "Xotik Cola" } },
-      { id: "lemon", label: { en: "Clear Lemon", hinglish: "Clear Lemon" } },
+      {
+        id: "jeeru",
+        label: { en: "Jeeru Masala", hinglish: "Jeeru Masala" },
+        billboard: { en: "JEERU MASALA", hinglish: "JEERU MASALA" },
+        tag: { en: "Flagship", hinglish: "Asli" },
+      },
+      {
+        id: "cola",
+        label: { en: "Xotik Cola", hinglish: "Xotik Cola" },
+        billboard: { en: "XOTIK COLA", hinglish: "XOTIK COLA" },
+        tag: { en: "Deep pour", hinglish: "Deep pour" },
+      },
+      {
+        id: "lemon",
+        label: { en: "Clear Lemon", hinglish: "Clear Lemon" },
+        billboard: { en: "CLEAR LEMON", hinglish: "CLEAR LEMON" },
+        tag: { en: "Bright cut", hinglish: "Tez cut" },
+      },
     ],
   },
   manifesto: {
@@ -141,14 +165,18 @@ export const copy = {
       en: "THE J MANIFESTO",
       hinglish: "J KA MANIFESTO",
     },
+    hoverHint: {
+      en: "HOVER EACH LINE",
+      hinglish: "HAR LINE PE HOVER",
+    },
     stops: [
       {
         id: "pocket",
         label: { en: "J MANIFESTO · 01 / 05", hinglish: "J MANIFESTO · 01 / 05" },
-        title: { en: "POCKET-SIZED PRIDE", hinglish: "JEB MEIN J" },
+        title: { en: "POCKET-SIZED PRIDE", hinglish: "जेब में J" },
         body: {
-          en: "Small bottle. Big scene. J fits the gully, the ride home, and every pocket that needs fizz.",
-          hinglish: "Chhoti bottle. Bada scene. Gully se ghar tak — jeb mein poora fizz.",
+          en: "Small can. Big scene. J fits the gully, the ride home, and every pocket that needs fizz.",
+          hinglish: "Chhoti can. Bada scene. Gully se ghar tak — jeb mein poora fizz.",
         },
       },
       {
@@ -221,11 +249,14 @@ export const copy = {
     ],
   },
   cta: {
+    kicker: { en: "06 · Find · Xotik Frujus", hinglish: "06 · खोज · Xotik Frujus" },
+    locator: { en: "Talk to us", hinglish: "Humse baat karo" },
     primary: { en: "Find J near you", hinglish: "J kahan milega?" },
-    secondary: { en: "The Xotik story", hinglish: "Xotik ki baat" },
+    secondary: { en: "Parent: Xotik", hinglish: "Parent: Xotik" },
     stores: {
-      en: "Full store map launches in Phase 2. For now, reach us to find J near you.",
-      hinglish: "Store map Phase 2 mein. Abhi J dhundhne ke liye humse baat karo.",
+      en: "This is the J by Jeeru presentation. Store map lands with the full xotik.co.in rebuild — for now, email or call and we’ll point you to J.",
+      hinglish:
+        "Yeh J by Jeeru presentation hai. Full store map xotik.co.in rebuild ke saath aayega — abhi email / call karo, hum bata denge.",
     },
   },
   footer: {
@@ -235,6 +266,22 @@ export const copy = {
     compliance: "FSSAI license · HALAL · FDA",
   },
 } as const;
+
+export function isEnglish(locale: Locale): boolean {
+  return locale === "en";
+}
+
+export function chapterKicker(chapterIndex: number, locale: Locale): string {
+  const chapter = copy.chapters[chapterIndex];
+  if (!chapter) return "";
+  const n = String(chapterIndex + 1).padStart(2, "0");
+  const label = locale === "en" ? chapter.label.en.toUpperCase() : chapter.label[locale];
+  return `${n} — ${label}`;
+}
+
+export function scriptDisplayClass(text: string): string {
+  return /\p{Script=Devanagari}/u.test(text) ? "font-devanagari-display" : "font-condensed";
+}
 
 export function t<T extends Record<Locale, string>>(block: T, locale: Locale): string {
   return block[locale];

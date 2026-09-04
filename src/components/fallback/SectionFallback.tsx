@@ -19,7 +19,7 @@ const SCENE_CHROME: Record<DesiPopScene, DesiPopChrome> = {
   hero: "full",
   street: "overlay",
   factory: "light",
-  product: "full",
+  product: "none", // matsuri flavor stage — no hero billboard chrome
   taste: "light",
   manifesto: "light",
   cta: "light",
@@ -58,7 +58,7 @@ export function SectionFallback({
   const chromeLevel = chrome ?? (scene ? SCENE_CHROME[scene] : undefined);
 
   const inner =
-    scene && chromeLevel ? (
+    scene && chromeLevel && chromeLevel !== "none" ? (
       <DesiPopShell
         scene={scene}
         chrome={overlayChrome ? "overlay" : chromeLevel}

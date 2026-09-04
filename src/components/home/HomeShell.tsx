@@ -10,6 +10,7 @@ import { ProductSection } from "@/components/sections/ProductSection";
 import { IngredientsSection } from "@/components/sections/IngredientsSection";
 import { ManifestoSection } from "@/components/sections/ManifestoSection";
 import { DesiPopCursor } from "@/components/motion/DesiPopCursor";
+import { JourneyCan } from "@/components/motion/JourneyCan";
 import { useScrollChapter } from "@/hooks/useScrollChapter";
 import { CtaSection } from "@/components/sections/CtaSection";
 import { useRef, useState } from "react";
@@ -24,6 +25,7 @@ export function HomeShell() {
   return (
     <>
       <DesiPopCursor />
+      <JourneyCan />
       <SiteHeader
         activeChapter={activeChapter}
         menuOpen={menuOpen}
