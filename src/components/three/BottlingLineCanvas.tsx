@@ -736,7 +736,7 @@ function LabelApplicatorClamp({
 
   return (
     <group position={[0, LABEL_CLAMP_Y, 0]}>
-      {/* Mast on the back rail — grounds the whole assembly */}
+      {/* Mast + slim boom from the back rail — supports the ring, no pedestal stack */}
       <mesh position={[0, 0.55, -0.88]} castShadow>
         <cylinderGeometry args={[0.05, 0.055, 1.15, 16]} />
         <meshStandardMaterial color="#2f363c" metalness={0.65} roughness={0.4} />
@@ -745,66 +745,48 @@ function LabelApplicatorClamp({
         <boxGeometry args={[0.22, 0.09, 0.22]} />
         <meshStandardMaterial color="#4a5258" metalness={0.7} roughness={0.32} />
       </mesh>
-
-      {/* Horizontal arm — label maker sits on this, not floating */}
-      <mesh position={[0, 0.12, -0.42]} castShadow>
-        <boxGeometry args={[0.16, 0.12, 0.78]} />
+      <mesh position={[0, 0.08, -0.48]} castShadow>
+        <boxGeometry args={[0.12, 0.08, 0.72]} />
         <meshStandardMaterial color="#3a424a" metalness={0.7} roughness={0.35} />
       </mesh>
-      <mesh position={[0, 0.12, -0.06]} castShadow>
-        <boxGeometry args={[0.28, 0.18, 0.2]} />
-        <meshStandardMaterial color="#4a5258" metalness={0.75} roughness={0.3} />
-      </mesh>
 
-      {/* Wrist / label-maker housing — parent for clamp + wrap head */}
-      <group position={[0, 0.02, 0]}>
-        <mesh position={[0, 0.28, 0]} castShadow>
-          <cylinderGeometry args={[0.09, 0.11, 0.22, 20]} />
-          <meshStandardMaterial color="#5e676e" metalness={0.78} roughness={0.28} />
+      {/* Clamp gates — parented to the boom assembly */}
+      <group ref={jawEntry} position={[-CLAMP_OPEN_X, 0, 0]}>
+        <mesh position={[0.08, 0, 0]} castShadow>
+          <boxGeometry args={[0.1, 0.42, 0.12]} />
+          <meshStandardMaterial color="#5e676e" metalness={0.75} roughness={0.3} />
         </mesh>
-        <mesh position={[0, 0.4, 0]}>
-          <boxGeometry args={[0.2, 0.06, 0.2]} />
+        <mesh position={[0.03, 0, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
+          <cylinderGeometry args={[0.22, 0.22, 0.07, 24, 1, false, 0, Math.PI]} />
           <meshStandardMaterial color="#c4a574" metalness={0.85} roughness={0.22} />
         </mesh>
+      </group>
+      <group ref={jawExit} position={[CLAMP_OPEN_X, 0, 0]}>
+        <mesh position={[-0.08, 0, 0]} castShadow>
+          <boxGeometry args={[0.1, 0.42, 0.12]} />
+          <meshStandardMaterial color="#5e676e" metalness={0.75} roughness={0.3} />
+        </mesh>
+        <mesh position={[-0.03, 0, 0]} rotation={[0, 0, -Math.PI / 2]} castShadow>
+          <cylinderGeometry args={[0.22, 0.22, 0.07, 24, 1, false, 0, Math.PI]} />
+          <meshStandardMaterial color="#c4a574" metalness={0.85} roughness={0.22} />
+        </mesh>
+      </group>
 
-        {/* Clamp gates — always parented to the arm/wrist */}
-        <group ref={jawEntry} position={[-CLAMP_OPEN_X, 0, 0]}>
-          <mesh position={[0.08, 0, 0]} castShadow>
-            <boxGeometry args={[0.1, 0.42, 0.12]} />
-            <meshStandardMaterial color="#5e676e" metalness={0.75} roughness={0.3} />
+      {/* Rotating label applicator — the wrap animation to keep */}
+      <group ref={spin}>
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[0.52, 0.018, 10, 48]} />
+          <meshStandardMaterial color="#6a737a" metalness={0.8} roughness={0.28} />
+        </mesh>
+        <group ref={roller} position={[0.52, CAN_WRAP.height * 0.42, 0]}>
+          <mesh rotation={[0, 0, Math.PI / 2]} castShadow>
+            <cylinderGeometry args={[0.055, 0.055, 0.14, 20]} />
+            <meshStandardMaterial color="#e8c57a" metalness={0.55} roughness={0.35} />
           </mesh>
-          <mesh position={[0.03, 0, 0]} rotation={[0, 0, Math.PI / 2]} castShadow>
-            <cylinderGeometry args={[0.22, 0.22, 0.07, 24, 1, false, 0, Math.PI]} />
-            <meshStandardMaterial color="#c4a574" metalness={0.85} roughness={0.22} />
+          <mesh position={[0.09, 0, 0]}>
+            <boxGeometry args={[0.08, 0.05, 0.05]} />
+            <meshStandardMaterial color="#4a5258" metalness={0.7} roughness={0.32} />
           </mesh>
-        </group>
-        <group ref={jawExit} position={[CLAMP_OPEN_X, 0, 0]}>
-          <mesh position={[-0.08, 0, 0]} castShadow>
-            <boxGeometry args={[0.1, 0.42, 0.12]} />
-            <meshStandardMaterial color="#5e676e" metalness={0.75} roughness={0.3} />
-          </mesh>
-          <mesh position={[-0.03, 0, 0]} rotation={[0, 0, -Math.PI / 2]} castShadow>
-            <cylinderGeometry args={[0.22, 0.22, 0.07, 24, 1, false, 0, Math.PI]} />
-            <meshStandardMaterial color="#c4a574" metalness={0.85} roughness={0.22} />
-          </mesh>
-        </group>
-
-        {/* Wrap head — orbits during apply; roller rides top→bottom */}
-        <group ref={spin}>
-          <mesh rotation={[Math.PI / 2, 0, 0]}>
-            <torusGeometry args={[0.52, 0.018, 10, 48]} />
-            <meshStandardMaterial color="#6a737a" metalness={0.8} roughness={0.28} />
-          </mesh>
-          <group ref={roller} position={[0.52, CAN_WRAP.height * 0.42, 0]}>
-            <mesh rotation={[0, 0, Math.PI / 2]} castShadow>
-              <cylinderGeometry args={[0.055, 0.055, 0.14, 20]} />
-              <meshStandardMaterial color="#e8c57a" metalness={0.55} roughness={0.35} />
-            </mesh>
-            <mesh position={[0.09, 0, 0]}>
-              <boxGeometry args={[0.08, 0.05, 0.05]} />
-              <meshStandardMaterial color="#4a5258" metalness={0.7} roughness={0.32} />
-            </mesh>
-          </group>
         </group>
       </group>
     </group>
