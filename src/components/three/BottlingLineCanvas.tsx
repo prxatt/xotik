@@ -771,8 +771,10 @@ function LabelApplicatorClamp({
       const orbit = apply * Math.PI * 2 * CLAMP_ORBIT_TURNS;
       if (carriage.current) carriage.current.position.y = ringY;
       if (spin.current) spin.current.rotation.y = orbit;
-      if (padA.current) padA.current.rotation.z = orbit * 1.2;
-      if (padB.current) padB.current.rotation.z = -orbit * 1.2;
+      // Pad/roller spin rates must be integers so wrap-complete (2 turns)
+      // lands on identity — otherwise homing to 0 pops (e.g. 1.2 → +144°).
+      if (padA.current) padA.current.rotation.z = orbit;
+      if (padB.current) padB.current.rotation.z = -orbit;
       if (roller.current) roller.current.rotation.x = orbit * 3;
     } else {
       if (spin.current) spin.current.rotation.y = 0;
